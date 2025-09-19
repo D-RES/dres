@@ -1,0 +1,191 @@
+kind: M
+api_version: v1beta3
+metadata:
+  display_name: D-RES
+  name: dres
+  publisher: University of Edinburgh (Institute for Energy Systems)
+  contact_point_name: Peter McCallum
+  contact_point_email: peter.mccallum@ed.ac.uk
+  summary: >
+    Network modelling and weather-informed EV scheduling, in response to extreme weather events
+  description: >
+    Model created at the University of Edinburgh as part of the D-RES Project, members: Desen Kirli, Laiz Souto, Peter McCallum, Weizhe (Killua) Qin.
+    
+    The D-RES model combines a MV network power-flow model with an optimisation model (using Grey Wolf Optimiser (GWO))to make decisions on Electric Vehicle (EV) charging and discharging. 
+
+    D-RES uses the open-source PyPSA library ([https://pypsa.org/](https://pypsa.org/)) for power-flow calculations.
+
+    The D-RES model produces a weather-informed scheduling of EVs (in terms of smart charging and discharging in the form of Vehicle-to-Grid) in order to maintain bus voltages within the operational limits in the case of extreme weather events. The current model uses data (network, weather, chargepoint, tariff, etc.) from the Orkney Islands as a case study, examining EV response in the event of a storm and fluctuating wind energy output.
+
+    As model outputs, D-RES provides the encapsulated PyPSA system results as a netCDF file (.nc; this can be re-opened using PyPSA), and supplements this with a number of additional CSV files defining the optimisation results, including: time-series for optimised EV operation; bus voltages (before and after smart scheduling of EVs); active and reactive power, generation and demand timeseries, net cost of EV operation and associated carbon emissions. Summarised technoeconomic KPIs are sumarrised in the associated Jupyter Notebook visualisation.
+
+    Acknowledgements
+
+    This model was developed as part the D-RES Project, funded under the DAFNI Centre of Excellence for Resilient Infrastructure Analysis within the UKRI Building a Secure and Resilient World and Research Data Cloud Pilot project Data Infrastructure for National Infrastructure, with grant number ST/ Eproject1-DRES ([https://www.dafni.ac.uk/](https://www.dafni.ac.uk/)).
+
+    Prior work from an earlier model was adopted to conduct this work, originating from DISPATCH Project (EPSRC EP/V042955/1; DecarbonISation PAThways for Cooling and Heating).
+  source_code: https://github.com/D-RES/dres
+  licence: https://creativecommons.org/licenses/by/4.0/deed.en
+
+
+spec:
+
+  inputs:
+    parameters:
+      
+      - name: verbose_console
+        title: Verbose console
+        description: Boolean flag to turn on/off internal console messages, default false (off). Setting to true will send print statements to console and to the online 'DAFNI Console' tool.
+        type: boolean
+        default: false
+        required: False
+
+      - name: start_date
+        title: start_date
+        description: Set start date of simulation (e.g. 2019-01-01 for 2019-01-01 00:00)
+        type: string
+        default: '2019-01-07'
+        required: False
+
+      - name: end_date
+        title: end_date
+        description: Set end date of simulation (e.g. 2019-01-01 for 2019-01-01 23:59)
+        type: string
+        default: '2019-01-07'
+        required: False
+      
+      - name: ev_model
+        title: ev_model
+        description: Specify level of EV charging network integration
+        type: string
+        default: include_evs
+        options:
+            - name: exclude_evs
+              title: exclude_evs
+            - name: include_evs
+              title: include_evs
+        required: True
+      
+      - name: pop_size
+        title: pop_size
+        description: Description TBC
+        type: integer
+        default: 10
+        min: 5
+        required: False
+      
+      - name: max_iter
+        title: max_iter
+        description: Description TBC
+        type: integer
+        default: 10
+        min: 5
+        required: False
+      
+      - name: initial_soc
+        title: Initial Soc
+        description: Description TBC
+        type: number
+        default: 0.3
+        min: 0
+        max: 1
+        required: False
+      
+      - name: delta_t
+        title: Delta T
+        description: Description TBC
+        type: number
+        default: 1
+        min: 0
+        required: False
+      
+      - name: capacity
+        title: Capacity
+        description: Description TBC
+        type: number
+        default: 16.45
+        min: 0
+        required: False
+      
+      - name: min_soc
+        title: Min SoC
+        description: Description TBC
+        type: number
+        default: 0.1
+        min: 0
+        max: 1
+        required: False
+      
+      - name: max_soc
+        title: MaxSoC
+        description: Description TBC
+        type: number
+        default: 0.9
+        min: 0
+        max: 1
+        required: False
+      
+      - name: charging_price
+        title: ChargingPrice
+        description: Description TBC
+        type: string
+        default: '[148.7,127.4,125.3,111.5,112.1,125.4,141.1,161.2,156.2,158.8,153.7,144.9,146.8,141.8,136.2,136.7,295.6,298.6,282.2,163.8,147.8,137.7,125.3,120.3]'
+        min: 2
+        required: False
+      
+      - name: discharging_price
+        title: DischargingPrice
+        description: Description TBC
+        type: string
+        default: '[148.7,127.4,125.3,111.5,112.1,125.4,141.1,161.2,156.2,158.8,153.7,144.9,146.8,141.8,136.2,136.7,295.6,298.6,282.2,163.8,147.8,137.7,125.3,120.3]'
+        min: 2
+        required: False
+      
+      - name: vehicle_power
+        title: Vehicle Power
+        description: Description TBC
+        type: number
+        default: 0.011
+        min: 0
+        required: False
+
+      - name: rescale_load
+        title: Re-scale load
+        description: Description TBC
+        type: number
+        default: 1.0
+        min: 0.0
+        required: False
+
+    dataslots:
+      - name: Input data for Orkney D-RES Model
+        description: >
+          Dataset relating to PyPSA-Orkney model
+        default:
+          - de964046-5c4c-499f-b43a-b9ac01265b2d
+        path: inputs/
+        required: False
+
+  
+  outputs:
+    datasets:
+      - name: reactive_power_losses.xlsx
+        type: xlsx
+        description: >
+          (Description to follow)
+      - name: reactive_power_losses_transformers.xlsx
+        type: xlsx
+        description: >
+          (Description to follow)
+      - name: pareto_front_extreme_V2G.csv
+        type: csv
+        description: >
+          (Description to follow)
+      - name: bus_voltage_data_extremeonedayV2G.csv
+        type: csv
+        description: >
+          (Description to follow)
+      - name: best_result_oneday_extreme_V2G.json
+        type: json
+        description: >
+          (Description to follow)
