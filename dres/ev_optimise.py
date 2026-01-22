@@ -13,10 +13,12 @@
 import os
 import numpy as np
 import pandas as pd
-from pypsa import Network
+import pypsa
 from datetime import datetime
 import json
 import random
+import copy
+from joblib import Parallel, delayed, parallel_backend
 
 # Custom Libraries
 from .dafni_utilities import performance, message_api
@@ -266,29 +268,25 @@ def simulate_evs(network, INPUT_FOLDER, assets):
     performance(t0)
 
 
+def init_worker(nc_path):
+    global _worker_net
+    _worker_net = pypsa.Network(nc_path)
+    
+
 class GWO:
-    def __init__(self, 
-                pop_size = 10,                  # Named arguments with defaults
-                dim = 24,
-                max_iter = 10,
-                initial_soc = 0.3,
-                delta_t = 1,
-                capacity = 16.45,
-                min_soc = 0.1,
-                max_soc = 0.9,
-                vehicle_power = 0.011,
-                lb_array = None,                # skip defaults for array arguments
-                ub_array = None,
-                charging_price = None,
-                discharging_price = None,
-                delta_soc = None,
-                network = None
-            ):
+    def __init__(self, pop_size, dim, max_iter, lb_array, ub_array, initial_soc, delta_t, capacity, min_soc, max_soc,
+                 charging_price, discharging_price, delta_soc, network):
         self.pop_size = pop_size
         self.dim = dim
         self.max_iter = max_iter
         self.lb_array = lb_array
         self.ub_array = ub_array
+        self.alpha_score = float("inf")
+        self.alpha_pos = np.zeros(dim)
+        self.beta_score = float("inf")
+        self.beta_pos = np.zeros(dim)
+        self.delta_score = float("inf")
+        self.delta_pos = np.zeros(dim)
         self.initial_soc = initial_soc
         self.delta_t = delta_t
         self.capacity = capacity
@@ -296,104 +294,102 @@ class GWO:
         self.max_soc = max_soc
         self.charging_price = charging_price
         self.discharging_price = discharging_price
-        self.delta_soc = delta_soc
-        self.network = network
-        self.vehicle_power = vehicle_power
+        self.best_scores = []  # Add a list to record the best score for each generation
+        self.optimal_voltage_variation = None # Added property to record optimal voltage fluctuations
+        self.optimal_total_cost = None  # Add property to record the optimal total cost
+        self.archive = []  # External file, store the non-dominant solution <-- make sure this line exists
+        self.delta_soc = delta_soc  # Additional SOC changes per hour
+        self.network = network  # Store network objects
 
-        # Initialize leader wolves
-        self.alpha_score = float("inf")
-        self.alpha_pos = np.zeros(dim)
-        self.beta_score = float("inf")
-        self.beta_pos = np.zeros(dim)
-        self.delta_score = float("inf")
-        self.delta_pos = np.zeros(dim)
-        
-        self.best_scores = []
-        self.optimal_voltage_variation = None
-        self.optimal_total_cost = None
-        self.archive = []  # Store non-dominated solutions
 
     def initialize_wolves(self):
-        """
-        Function description to follow.
-        """
-        t0 = performance()
-        
-        # Random initialization within bounds
         wolves = np.random.uniform(self.lb_array, self.ub_array, (self.pop_size, self.dim))
-        # Try loading a previously saved best solution as a starting point
+        # Read the best saved result and use it as the initial position of one of the wolves
         try:
             with open("best_result_oneday_extreme_V2G.json", 'r') as file:
                 best_result = json.load(file)
-                wolves[0] = np.array(best_result)
-                # message_api("Loaded best result as initial position.")
+                wolves[0] = np.array(best_result)  # Set the first Wolf to the best result
+                print("Loaded best result as initial position for one wolf.")
         except FileNotFoundError:
-            # message_api("No previous best result found.")
-            None
-        
-        # Apply SOC constraints
+            print("No previous optimal result found, initializing randomly.")
+
         for i in range(len(wolves)):
             wolves[i] = self.apply_soc_constraints(wolves[i])
-        
-        performance(t0)
         return wolves
 
+    def _min_hours_needed_rev(self, energy_gap, limit_array, t):
+        acc = 0.0
+        hours = 0
+        for h in range(t, -1, -1):
+            acc += limit_array[h] * self.delta_t
+            hours += 1
+            if abs(acc) >= abs(energy_gap):
+                return hours, acc 
+        return hours, acc 
+
     def objective_function(self, power_schedule):
-        """
-        Function description to follow.
-        """
-        t0 = performance()
-        
-        # Evaluate the power schedule:
-        # 1. Apply SOC constraints
-        # 2. Run power flow on a copy of the network
-        # 3. Compute voltage deviation and cost
-
-        # network = self.network    
-        soc = self.initial_soc
+        # Create a deep copy of network
+        global _worker_net
+        if _worker_net is None:
+            _worker_net = pypsa.Network("base_net.nc")
+        network_copy = copy.deepcopy(_worker_net)
+        network_copy.lines.loc[network_copy.lines['r'] == 0, 'r'] = 1e-6
         total_cost = 0
-
-        # Update SOC and cost for each hour
+        # Apply SOC constraints
         for t in range(self.dim):
-            soctemporary = soc
-            soc -= (power_schedule[t] * self.delta_t) / self.capacity
-            if soc < self.min_soc and power_schedule[t] > 0:
-                soc = np.clip(soc, self.min_soc, self.max_soc)
-                power_schedule[t] = (soctemporary - soc) * self.capacity / self.delta_t
-                soc = soctemporary - (power_schedule[t] * self.delta_t) / self.capacity
-            elif soc > self.max_soc and power_schedule[t] < 0:
-                soc = np.clip(soc, self.min_soc, self.max_soc)
-                power_schedule[t] = (soctemporary - soc) * self.capacity / self.delta_t
-                soc = soctemporary - (power_schedule[t] * self.delta_t) / self.capacity
-            # Calculate charge and discharge costs per hour
-            soc += self.delta_soc[t] # Add SOC changes for vehicle departure or arrival
             if power_schedule[t] < 0:  # Charging cost
                 total_cost += abs(power_schedule[t]) * self.charging_price[t]
             else:  # Discharge revenue
                 total_cost -= abs(power_schedule[t]) * self.discharging_price[t]
+        # ------------------------------------------------------------
+        p_ser = pd.Series(power_schedule, index=network_copy.snapshots)
 
-        # Set EV schedule to storage unit and run PF
-        self.network.storage_units_t.p_set.loc[:, "KIRKWA3A_Storage"] = power_schedule
-        # message_api("BREAKPOINT")
-        self.network.pf()
+        network_copy.links_t.p_set.loc[:, "Battery_Charge"] = (-p_ser).clip(lower=0)
+        network_copy.links_t.p_set.loc[:, "Battery_Discharge"] = p_ser.clip(lower=0)
+        network_copy.optimize(solver_name="gurobi")
+        optimal_generator_t_p=network_copy.generators_t.p
+        optimal_storage_t_p=network_copy.storage_units_t.p
+        # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        powerflow_network = pypsa.Network().import_from_netcdf("base_net.nc")
+        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        powerflow_network.generators_t.p_set = optimal_generator_t_p
+        wind_gens = [g for g in powerflow_network.generators.index
+             if "WindTurbine_" in g]         
 
-        # Voltage deviation calculation:
-        # Example: sum of (v - 1)^3 over time at a certain bus (KIRKWA3A)
-        voltage_deviation = (self.network.buses_t.v_mag_pu["KIRKWA3A"] - 1)**4
-        voltage_variation = voltage_deviation.sum()
-        
-        # Return two objectives: (voltage_variation, total_cost)
-        
-        performance(t0)
-        return np.array([voltage_variation, total_cost])
+        pf = 0.95                          
+        tan_phi = np.tan(np.arccos(pf))        
+
+        for g in wind_gens:
+            p_series = powerflow_network.generators_t.p_set[g]  
+            q_series = -p_series * tan_phi*0.6
+            powerflow_network.generators.loc[g, "control"] = "PQ"
+            powerflow_network.generators_t.q_set[g] = q_series  
+        powerflow_network.storage_units_t.p_set = optimal_storage_t_p
+        powerflow_network.add("StorageUnit",
+                    name="KIRKWA3A_Storage",
+                    bus="KIRKWA3A",
+                    p_nom=2.585,
+                    max_hours=16.45 / 2.585,
+                    efficiency_store=0.91,
+                    efficiency_dispatch=0.91,
+                    controllable=False  
+                    )
+        powerflow_network.storage_units_t.p_set.loc[:, "KIRKWA3A_Storage"] = power_schedule
+    
+        # Run the power flow
+        powerflow_network.pf()
+        v_ref = 1.0
+        v_dev = powerflow_network.buses_t.v_mag_pu - v_ref
+        v_dev_squared_sum = (v_dev ** 2).sum(axis=1)
+        total_v_dev_squared_sum = v_dev_squared_sum.sum()
+        return np.array([total_v_dev_squared_sum, total_cost])
 
     def pareto_sort(self, objectives):
         """
-        Function description to follow.
+        Pareto sort, which returns the rank of each individual.
+        :param objectives: List of individual objectives, such as [[obj1_1, obj2_1], [obj1_2, obj2_2],...]
+        :return: A list of levels for each individual
         """
-        t0 = performance()
-        
-        # Perform non-dominated sorting to classify solutions into Pareto fronts
         num_individuals = len(objectives)
         domination_counts = np.zeros(num_individuals, dtype=int)
         dominated_sets = [[] for _ in range(num_individuals)]
@@ -408,7 +404,7 @@ class GWO:
             if domination_counts[p] == 0:
                 pareto_fronts[0].append(p)
 
-        i=0
+        i = 0
         while pareto_fronts[i]:
             next_front = []
             for p in pareto_fronts[i]:
@@ -416,208 +412,168 @@ class GWO:
                     domination_counts[q] -= 1
                     if domination_counts[q] == 0:
                         next_front.append(q)
-            i+=1
+            i += 1
             pareto_fronts.append(next_front)
-        
-        performance(t0)
         return pareto_fronts[:-1]
 
     def dominates(self, ind1, ind2):
         """
-        Function description to follow.
+        Determine whether ind1 dominates ind2.
         """
-        # t0 = performance()
-        
-        # ind1 dominates ind2 if ind1 is strictly better in at least one objective and not worse in others
-        result = all(x<=y for x,y in zip(ind1,ind2)) and any(x<y for x,y in zip(ind1,ind2))
-        # performance(t0)
-        return result
+        return all(x <= y for x, y in zip(ind1, ind2)) and any(x < y for x, y in zip(ind1, ind2))
 
     def calculate_crowding_distance(self, objectives):
-        """
-        Function description to follow.
-        """
-        t0 = performance()
-        
-        # For handling diversity in solutions on Pareto front
         num_individuals = len(objectives)
         num_objectives = len(objectives[0])
         distances = np.zeros(num_individuals)
         for i in range(num_objectives):
-            obj_values = np.array([obj[i] for obj in objectives])
-            sorted_indices = np.argsort(obj_values)
-            max_val = obj_values[sorted_indices[-1]]
-            min_val = obj_values[sorted_indices[0]]
+            objective_values = np.array([obj[i] for obj in objectives])
+            sorted_indices = np.argsort(objective_values)
+            max_val = objective_values[sorted_indices[-1]]
+            min_val = objective_values[sorted_indices[0]]
             distances[sorted_indices[0]] = distances[sorted_indices[-1]] = 1e6
-            if max_val == min_val: 
+            # Do not set the distance of boundary individuals directly to inf when calculating crowding distance. inf can be replaced by a large finite value:
+            if max_val == min_val:
                 continue
-            for j in range(1, num_individuals-1):
-                distances[sorted_indices[j]] += (obj_values[sorted_indices[j+1]] - obj_values[sorted_indices[j-1]])/(max_val - min_val)
-        
-        performance(t0)
+            for j in range(1, num_individuals - 1):
+                distances[sorted_indices[j]] += (
+                        (objective_values[sorted_indices[j + 1]] - objective_values[sorted_indices[j - 1]]) / (
+                            max_val - min_val)
+                )
         return distances
+    
+    def select_alpha_beta_delta(self, wolves, objectives,pareto_fronts=None):
+        fronts = self.pareto_sort(objectives)
+        first_front = fronts[0]             
+        need = 3 - len(first_front)
+        if need > 0 and len(fronts) > 1:
+            first_front += fronts[1][:need]
+        obj_arr = np.array(objectives)
+        sub_obj = obj_arr[first_front]
+        distances = self.calculate_crowding_distance(sub_obj)
+        sorted_idx = np.argsort(-np.array(distances))
+        alpha_idx = first_front[sorted_idx[0]]
+        beta_idx  = first_front[sorted_idx[1 if len(sorted_idx)>1 else 0]]
+        delta_idx = first_front[sorted_idx[2 if len(sorted_idx)>2 else 0]]
 
-    def select_alpha_beta_delta(self, wolves, objectives, pareto_fronts):
-        """
-        Function description to follow.
-        """
-        t0 = performance()
-        
-        # Select the top three wolves (alpha, beta, delta) considering rank, crowding, and distance to ideal point
-        num_individuals = len(objectives)
-        domination_ranks = np.zeros(num_individuals)
-        for rank, front in enumerate(pareto_fronts):
-            for idx in front:
-                domination_ranks[idx] = rank
-
-        crowding_distances = self.calculate_crowding_distance(objectives)
-        objectives_array = np.array(objectives)
-        message_api(msg=f"objectives_array = {objectives_array}")
-        ideal_point = np.min(objectives_array, axis=0)
-        message_api(msg=f"ideal_point = {ideal_point}")
-        distances_to_ideal = np.linalg.norm(objectives_array - ideal_point, axis=1)
-        message_api(msg=f"distances_to_ideal = {distances_to_ideal}")
-
-        norm_domination = (domination_ranks - domination_ranks.min())/(domination_ranks.max()-domination_ranks.min()+1e-9)
-        message_api(msg=f"norm_domination = {norm_domination}")
-        norm_crowding = (crowding_distances - crowding_distances.min())/(crowding_distances.max()-crowding_distances.min()+1e-9)
-        message_api(msg=f"norm_crowding = {norm_crowding}")
-        norm_distance = (distances_to_ideal - distances_to_ideal.min())/(distances_to_ideal.max()-distances_to_ideal.min()+1e-9)
-        message_api(msg=f"norm_distance = {norm_distance}")
-
-        # Weighted combination to identify top solutions
-        w1, w2, w3 = 0.5, -0.2, 0.5
-        message_api(msg=f"w1, w2, w3 = {w1}, {w2}, {w3}")
-        overall_scores = w1*norm_domination + w2*norm_crowding + w3*norm_distance
-        message_api(msg=f"overall_scores = {overall_scores}")
-        sorted_indices = np.argsort(overall_scores)
-        message_api(msg=f"sorted_indices = {sorted_indices}")
-        alpha_idx, beta_idx, delta_idx = sorted_indices[0], sorted_indices[1], sorted_indices[2]
-        message_api(msg=f"alpha_idx, beta_idx, delta_idx = {alpha_idx}, {beta_idx}, {delta_idx}")
-        
-        performance(t0)
         return wolves[alpha_idx], wolves[beta_idx], wolves[delta_idx]
 
+    #
     def optimize(self):
-        """
-        Function description to follow.
-        """
-        t0 = performance()
-        
         wolves = self.initialize_wolves()
+        n_jobs = -1       
+        nc_path = "base_net.nc"
+        parallel = Parallel(n_jobs=n_jobs, backend="loky",
+                    initializer=init_worker, initargs=(nc_path,))
         for iter in range(self.max_iter):
-            # message_api(f"Generation {iter+1}/{self.max_iter}")
-            objectives = np.array([self.objective_function(wolf) for wolf in wolves])
-            pareto_fronts = self.pareto_sort(objectives.tolist())
-
+            print(f"Generation {iter + 1}/{self.max_iter}")
+            objectives = parallel(delayed(self.objective_function)(wolf.copy()) for wolf in wolves)
+            pareto_fronts = self.pareto_sort(list(objectives))
+            # Update external files
             self.archive = self.update_external_archive(self.archive, wolves, objectives)
-            self.alpha_pos, self.beta_pos, self.delta_pos = self.select_alpha_beta_delta(wolves, objectives, pareto_fronts)
-
-            a = 2 - iter*(2/self.max_iter)
-
-            # Update wolves positions
+            # Select Alpha, Beta, and Delta wolves from the current population
+            self.alpha_pos, self.beta_pos, self.delta_pos = self.select_alpha_beta_delta(wolves, objectives,
+                                                                                         pareto_fronts)
+            # Update population location
+            a = 2 - iter * (2 / self.max_iter)
+            # Update position of all wolves
             for i in range(self.pop_size):
                 for j in range(self.dim):
                     r1 = np.random.rand()
                     r2 = np.random.rand()
 
-                    A1 = 2*a*r1 - a
-                    C1 = 2*r2
-                    D_alpha = abs(C1*self.alpha_pos[j]-wolves[i][j])
-                    X1 = self.alpha_pos[j]-A1*D_alpha
+                    A1 = 2 * a * r1 - a
+                    C1 = 2 * r2
+                    D_alpha = abs(C1 * self.alpha_pos[j] - wolves[i][j])
+                    X1 = self.alpha_pos[j] - A1 * D_alpha
 
                     r1 = np.random.rand()
                     r2 = np.random.rand()
-                    A2 = 2*a*r1 - a
-                    C2 = 2*r2
-                    D_beta = abs(C2*self.beta_pos[j]-wolves[i][j])
-                    X2 = self.beta_pos[j]-A2*D_beta
+                    A2 = 2 * a * r1 - a
+                    C2 = 2 * r2
+                    D_beta = abs(C2 * self.beta_pos[j] - wolves[i][j])
+                    X2 = self.beta_pos[j] - A2 * D_beta
 
                     r1 = np.random.rand()
                     r2 = np.random.rand()
-                    A3 = 2*a*r1 - a
-                    C3 = 2*r2
-                    D_delta = abs(C3*self.delta_pos[j]-wolves[i][j])
-                    X3 = self.delta_pos[j]-A3*D_delta
+                    A3 = 2 * a * r1 - a
+                    C3 = 2 * r2
+                    D_delta = abs(C3 * self.delta_pos[j] - wolves[i][j])
+                    X3 = self.delta_pos[j] - A3 * D_delta
 
-                    wolves[i][j] = (X1+X2+X3)/3
+                    wolves[i][j] = (X1 + X2 + X3) / 3
 
+                # Apply constraints
                 wolves[i] = self.apply_soc_constraints(wolves[i])
 
-        
-        performance(t0)
         return self.archive
 
     def apply_soc_constraints(self, power_schedule):
-        """
-        Function description to follow.
-        """
-        t0 = performance()
-        
-        # Adjust power schedule to ensure final SOC and no violations
+        #
+        x = power_schedule.copy()
         soc = self.initial_soc
         final_soc = 0.9
-        for t in range(len(power_schedule)):
-            power_schedule[t] = np.clip(power_schedule[t], self.lb_array[t], self.ub_array[t])
-            soctemp = soc
-            soc_difference = final_soc - soctemp
-            power_gap = soc_difference*self.capacity/self.delta_t
+        for t in range(len(x)):
+            # Apply dynamic lb and ub
+            x[t] = np.clip(x[t], self.lb_array[t], self.ub_array[t])
 
-            # Adjust based on final SOC target and power limits
+            soctemporary = soc
+            # Add a constraint here that makes the final SOC value equal to the initial SOC value, the constraint is in place first.
+            soc_difference = final_soc - soctemporary
+            power_gap = soc_difference * self.capacity / self.delta_t
             if power_gap > 0:
-                m = int(power_gap/(self.vehicle_power*235))+1
-                if (t+m)>=23:
-                    if abs(power_schedule[t])<(power_gap-(m-1)*(self.vehicle_power*235)) or abs(power_schedule[t])>(self.vehicle_power*235):
-                        power_schedule[t] = -random.uniform((power_gap-(m-1)*(self.vehicle_power*235)), (self.vehicle_power*235))
-                    if t==23:
-                        power_schedule[t] = -power_gap
-            else:
-                m = int(power_gap/(self.vehicle_power*235))-1
-                if (t+abs(m))>=23:
-                    if abs(power_schedule[t])<(power_gap-(m-1)*(self.vehicle_power*235)) or abs(power_schedule[t])>(self.vehicle_power*235):
-                        power_schedule[t] = random.uniform((abs(power_gap)-(abs(m)-1)*(self.vehicle_power*235)),(self.vehicle_power*235))
-                    if t==23:
-                        power_schedule[t] = abs(power_gap)
+                #m = int(power_gap / (vehicle_power * 235)) + 1
+                m,energy = self._min_hours_needed_rev(power_gap, (-self.lb_array), t)
+                if (t + m) == 23:
+                    if not (self.lb_array[t] <=x[t]<=(-energy+power_gap)):
+                        x[t]=np.clip(x[t], self.lb_array[t],(-energy+power_gap))
+                elif (t + m) > 23:
+                    x[t]=self.lb_array[t]
+            elif power_gap < 0:
+                m,energy= self._min_hours_needed_rev((-power_gap), self.ub_array, t)
+                if (t + abs(m)) == 23:
+                    if not ( (energy + power_gap) <= x[t] <=self.ub_array[t]):
+                        x[t] = np.clip( x[t], (energy + power_gap), self.ub_array[t])
+                elif (t + abs(m)) > 23:
+                    x[t] = self.ub_array[t] 
+            soc -= (x[t] * self.delta_t) / self.capacity
 
-            soc -= (power_schedule[t]*self.delta_t)/self.capacity
-            if soc<self.min_soc and power_schedule[t]>0:
-                soc = np.clip(soc, self.min_soc, self.max_soc)
-                power_schedule[t]=(soctemp-soc)*self.capacity/self.delta_t
-            elif soc>self.max_soc and power_schedule[t]<0:
-                soc = np.clip(soc, self.min_soc, self.max_soc)
-                power_schedule[t]=(soctemp-soc)*self.capacity/self.delta_t
+            #
+            if soc < self.min_soc and x[t] > 0:
+                soc = np.clip(soc, self.min_soc- self.delta_soc[t], self.max_soc)
+                x[t] = (soctemporary - soc) * self.capacity / self.delta_t
+            elif soc > self.max_soc and x[t] < 0:
+                soc = np.clip(soc, self.min_soc- self.delta_soc[t], self.max_soc)
+                x[t] = (soctemporary - soc) * self.capacity / self.delta_t  #
 
-            soc += self.delta_soc[t]
-        
-        performance(t0)
-        return power_schedule
+            soc += self.delta_soc[t]  # Add SOC changes for vehicle departure or arrival
+            if power_gap==0:
+                if t==23:
+                    x[t]=self.delta_soc[t]* self.capacity / self.delta_t
+                    soc = soctemporary
+        return x
 
-    def update_external_archive(self, archive, wolves, objectives, max_size=100):
-        """
-        Function description to follow.
-        """
-        t0 = performance()
-        
-        # Keep non-dominated solutions in an external archive
-        combined_positions = list(wolves) + [ind['position'] for ind in archive]
-        combined_objectives = objectives.tolist() + [ind['objective'] for ind in archive]
-
+    def update_external_archive(self, archive, wolves, objectives, max_size=2500):
+        # Adds the non-dominated solution of the current population to an external file
+        combined_positions = [w.copy() for w in wolves] + [ind['position'] for ind in archive]
+        combined_objectives = [ obj.copy()        for obj in objectives ] \
+                   + [ ind['objective']   for ind in archive ]
+        # Undominated sorting of combined solutions
         pareto_fronts = self.pareto_sort(combined_objectives)
         new_archive = []
         for front in pareto_fronts:
             for idx in front:
-                individual = {'position': combined_positions[idx], 'objective': combined_objectives[idx]}
+                individual = {'position': combined_positions[idx].copy(), 'objective': combined_objectives[idx].copy()}
                 new_archive.append(individual)
-            if len(new_archive)>=max_size:
+            if len(new_archive) >= max_size:
                 break
 
-        if len(new_archive)>max_size:
+        # If the file exceeds the maximum size, truncate it using crowding sort
+        if len(new_archive) > max_size:
             distances = self.calculate_crowding_distance([ind['objective'] for ind in new_archive])
             sorted_indices = np.argsort(-np.array(distances))
             new_archive = [new_archive[i] for i in sorted_indices[:max_size]]
 
-        
-        performance(t0)
         return new_archive
 
 
@@ -647,17 +603,25 @@ def select_closest_to_ideal(pareto_front):
     """
     t0 = performance()
     
-    objectives = np.array([sol['objective'] for sol in pareto_front])
+    objectives = np.array([solution['objective'] for solution in pareto_front])
+    # Calculate minimum and maximum values for each target
     min_obj = objectives.min(axis=0)
     max_obj = objectives.max(axis=0)
+    # Calculate the range of target values to avoid division by zero errors
     ranges = max_obj - min_obj
-    ranges[ranges==0] = 1
-    normalized_objectives = (objectives - min_obj)/ranges
+    ranges[ranges == 0] = 1  # Prevents division by zero
+    # Normalize the target value
+    normalized_objectives = (objectives - min_obj) / ranges
+    # Define the ideal point as a point composed of the minimum normalized target values ([0, 0]), if you want the ideal point to be defined in the original target space as a point composed of the minimum values of each target, then the ideal point will still be [0, 0] after normalization. But if you do not normalize and calculate the distance directly in the original target space
+    # The ideal point is the minimum value after normalization (that is, all zeros),
     ideal_point = np.zeros(objectives.shape[1])
+    #
     distances = np.linalg.norm(normalized_objectives - ideal_point, axis=1)
+    # Find the solution with the smallest distance
     best_index = np.argmin(distances)
+    optimal_solution = pareto_front[best_index]
     
     performance(t0)
-    return pareto_front[best_index]
+    return optimal_solution
 
 

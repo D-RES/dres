@@ -175,4 +175,3 @@ cython_debug/
 ## CUSTOM
 *.cache.sqlite
 *temp__*
-Dockerfile_local*

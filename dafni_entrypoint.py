@@ -20,7 +20,6 @@ import os
 import numpy as np
 import json
 import pandas as pd
-import pickle
 
 # Custom Libraries
 import dres.base_model as base_model
@@ -46,9 +45,10 @@ sim = DRES_Sim(
     min_soc = 0.1,
     max_soc = 0.9,
     vehicle_power = 0.011,
-    # data_root='../../DATA',
-    # input_dir="inputs_KQ_20250601_verify", # default is "input"
-    # legacy=True,
+    data_root='../../DATA',
+    #input_dir="inputs_KQ_20250601_verify", # default is "input"
+    #output_dir="outputs_verify", # default is "output"
+    #legacy=True,
 )
 
 
@@ -58,6 +58,10 @@ sim = DRES_Sim(
 # %% 
 # Build baseline power network model
 network = sim.build_baseline_model()
+network.export_to_netcdf(os.path.join(sim.OUTPUT_FOLDER, "base_net0.nc"))
+base_model.add_enhanced_storage_to_network(network)
+base_model.add_control(network, sim)
+network.export_to_netcdf(os.path.join(sim.OUTPUT_FOLDER, "base_net.nc"))
 
 ###############################################################################################################
 
@@ -127,9 +131,7 @@ message_api(msg=f"Pareto Front Solutions:")
 
 # %% 
 # 4.4 Saving and Plotting Pareto Front Results
-pareto_objectives = [individual['objective'] for individual in pareto_front]
-pareto_objectives = pd.DataFrame(pareto_objectives).set_index(0)
-
+ev_optimise.save_pareto_front(pareto_front, filename=os.path.join(sim.OUTPUT_FOLDER,"pareto_front_extreme_V2G.csv"))
 
 
 # %% 
@@ -412,13 +414,4 @@ generate_run_metadata({
     'compute_time': f"finished in {t1 - sim.t0 :0.4f} seconds"
 }, sim.OUTPUT_FOLDER)
 
-# %%
-with open(os.path.join(sim.OUTPUT_FOLDER, 'ev_model_outputs.pkl'), 'wb') as f:
-    pickle.dump({
-        'pareto_front': pareto_front,
-        'pareto_objectives': pareto_objectives,
-        'optimal_power_schedule': optimal_power_schedule,
-        'delta_soc': delta_soc,
-        'gwo_best_scores': gwo.best_scores,
-    }, f)
 # %%

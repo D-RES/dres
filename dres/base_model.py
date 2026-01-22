@@ -230,6 +230,7 @@ def add_wind_turbines_to_network(network, sim, weather_state, storm_wind_speeds)
         # Loop to add the specified number of turbines for each bus
         for j in range(sim.assets['WindFarms'][wind_farm]['n_turbines']):
             turbine_name = f"{windfarm_name}_Turbine_{j+1}"
+
             if 'alt_name' in sim.assets['WindFarms'][wind_farm]:
                 if sim.assets['WindFarms'][wind_farm]['alt_name'] is not None:
                     turbine_name = sim.assets['WindFarms'][wind_farm]['alt_name']
@@ -540,11 +541,62 @@ def add_offshore_marine_to_network(network, sim):
     performance(t0)
 
 
-def add_slack_control(network, sim):
+def add_control(network, sim):
+    t0 = performance()
     if sim.legacy:
         network.generators.loc["Slack_generator", "control"] = "Slack"
     else:
         None
+
+    network.buses["v_mag_pu_min"] = 0.90 
+    network.buses["v_mag_pu_max"] = 1.10 
+    network.generators.control = "PV"
+
+
+    performance(t0)
+
+
+def add_enhanced_storage_to_network(network):
+    t0 = performance()
+    
+
+    if "KIRKWA3A_Store_bus" not in network.buses.index:
+        network.add("Bus", 
+                    name="KIRKWA3A_Store_bus",
+                    v_nom=33,  
+                    carrier="AC")
+
+    p_nom   =4      # MW  
+    e_cap   = 18     # MWh 
+    eta_in  = 1      
+    eta_out = 1     
+    soc0    = 0.30     
+
+    network.add("StorageUnit",
+                name="Battery_Store",
+                bus="KIRKWA3A_Store_bus",
+                e_nom=e_cap,
+                e_initial=e_cap * soc0,
+                e_cyclic=False)      
+
+    network.add("Link",
+                name="Battery_Charge",
+                bus0="KIRKWA3A",           
+                bus1="KIRKWA3A_Store_bus",  
+                efficiency=eta_in,
+                p_nom=p_nom,
+                controllable=False)        
+
+    network.add("Link",
+                name="Battery_Discharge",
+                bus0="KIRKWA3A_Store_bus",
+                bus1="KIRKWA3A",
+                efficiency=eta_out,
+                p_nom=p_nom,
+                controllable=False)
+    
+    performance(t0)
+
 
 def run_power_flow(network, OUTPUT_FOLDER):
     message_api(msg="# Run baseline power network model")

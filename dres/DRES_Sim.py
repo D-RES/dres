@@ -33,7 +33,6 @@ following parameters:
 import os
 import ast
 import socket
-import yaml
 
 # Custom Libraries
 from dres.dafni_utilities import IO_file_paths, performance, message_api, generate_run_metadata
@@ -118,9 +117,6 @@ class DRES_Sim():
 
         # Gather assets
         self.assets = nemo.load_yaml(dir=self.INPUT_FOLDER, filename="assets")
-
-        with open(os.path.join(self.OUTPUT_FOLDER,'assets.yaml'), 'w') as f:
-            yaml.dump(self.assets, f)
         
         
     # Main run sequence
@@ -143,7 +139,6 @@ class DRES_Sim():
         base_model.define_transformers(network, self)
         base_model.add_shunts_to_network(network, self)
         base_model.add_offshore_marine_to_network(network, self)
-        base_model.add_slack_control(network, self)
 
         return network
 

@@ -51,16 +51,18 @@ def IO_file_paths(data_root=None, input_dir="inputs"):
     return INPUT_FOLDER, OUTPUT_FOLDER
 
 
-def performance(t0=None, msg="", always_verbose=False):
+def performance(t0=None, msg="", always_verbose=False, verbose=False):
     """
     Print calling function and corresponding performance.
     """
 
-    verbose_console = os.getenv("verbose_console", True)
+    if verbose is None:
+        verbose = os.getenv("verbose_console", "True").lower() in ("true", "1", "yes")
 
-    if verbose_console or always_verbose:
+    if verbose or always_verbose:
         if t0 is None:
             t0 = time.perf_counter()
+            print("Runtime performance:")
             return t0
         else:
             t1 = time.perf_counter()
