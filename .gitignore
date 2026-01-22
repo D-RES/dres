@@ -175,3 +175,4 @@ cython_debug/
 ## CUSTOM
 *.cache.sqlite
 *temp__*
+.DS_Store
