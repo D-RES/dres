@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dres"
+version = "0.3.1"
+description = "A utility package for creating DAFNI-ready PyPSA models. More information about DAFNI (Data & Analytics Facility for National Infrastructure) can be found at https://www.dafni.ac.uk/"
+readme = "README.md"
+license = {text = "GNU v3"}
+requires-python = ">=3.11"
+dependencies = [
+    "geographiclib>=2.0",
+    "joblib>=1.3.0",
+    "matplotlib>=3.7.0",
+    "nbformat>=4.2.0",
+    "numpy>=1.24.0",
+    "openmeteo-requests>=1.0.0",
+    "pandas>=2.0.0",
+    "platformdirs>=3.0.0",
+    "plotly>=5.14.0",
+    "pypsa>=0.25.0",
+    "PyYAML>=6.0",
+    "requests>=2.31.0",
+    "requests-cache>=1.0.0",
+    "retry-requests>=2.0.0",
+]
+
+[project.urls]
+Homepage = "https://www.dafni.ac.uk/"
+
+[tool.setuptools]
+packages = ["dres"]
+zip-safe = false

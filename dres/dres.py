@@ -1,9 +1,7 @@
 from .config import get_or_create_config
 from pathlib import Path
-import pandas as pd
 
 from .plots import Plots
-from dres import ev_optimise
 from .ev import EV
 
 
