@@ -45,7 +45,7 @@ def create_bus_network(network, sim):
 
     network.add("Carrier", "AC")
 
-    # Read Excel file for bus input
+    # Read CSV file for bus input
     file_path = os.path.join(sim.paths.inputs,"Bus_Input.csv")
     buses = pd.read_csv(file_path)
 
@@ -79,7 +79,7 @@ def create_bus_network(network, sim):
 def create_transmission_network(network, sim):
     t0 = performance()
 
-    # Read Excel file for Transmission Line input
+    # Read CSV file for Transmission Line input
     filename = 'Transmission_input.csv'
     full_filename = os.path.join(sim.paths.inputs, filename)
     df = pd.read_csv(full_filename)
@@ -120,7 +120,7 @@ def create_transmission_network(network, sim):
 def add_loads_to_network(network, sim):
     t0 = performance()
 
-    # Load the data from the Excel file for load profiles
+    # Load the data from the CSV file for load profiles
     file_path_load = os.path.join(sim.paths.inputs,"Load_Profile.csv")
     df = pd.read_csv(file_path_load)
     df.DateTime = pd.to_datetime(df.DateTime)
@@ -207,7 +207,7 @@ def add_wind_turbines_to_network(network, sim, weather_state, storm_wind_speeds)
         pf = 0.95  # 设定功率因数
         tan_phi = np.tan(np.arccos(pf))  # 计算 tan(θ)
 
-        # 读取 Excel 文件中的无功功率时间序列
+        # 读取 CSV 文件中的无功功率时间序列
         q_series = wind_turbine_data.iloc[:, 1]
 
         # 计算基于 q_set 的 ±20% 变化范围
@@ -312,14 +312,14 @@ def add_storage_to_network(network, sim):
 def define_transformers(network, sim):
     t0 = performance()
 
-    # message_api('Read the Excel file')
-    # Read the Excel file
+    # message_api('Read the CSV file')
+    # Read the CSV file
     file_path = (
         # message_api('Update this with the correct file path')
         # Update this with the correct file path
-        os.path.join(sim.paths.inputs,"Transformer_types_definition.xlsx")
+        os.path.join(sim.paths.inputs,"Transformer_types_definition.csv")
     )
-    df = pd.read_excel(file_path)
+    df = pd.read_csv(file_path)
 
     # message_api('Define the transformer parameters based on your provided data')
     # Define the transformer parameters based on your provided data
@@ -347,17 +347,12 @@ def define_transformers(network, sim):
         network.transformer_types.loc[transformer_data["name"]
                                       ] = transformer_data
 
-    # message_api('Read Excel file')
-    # Read Excel file
-    file_path = os.path.join(sim.INPUT_FOLDER,"Transformer_input_with_type_definition.xlsx")
-    xls = pd.ExcelFile(file_path)
+    # Read CSV file
+    file_path = os.path.join(sim.paths.inputs,"Transformer_input_with_type_definition.csv")
+    buses = pd.read_csv(file_path)
 
-    # message_api('Excel file has sheets named "Sheet12')
-    # Excel file has sheets named "Sheet12
-    buses = pd.read_excel(xls, "Sheet1")
-
-    # message_api('Input bus data from Excel file "Bus Input Final(Orkney)"')
-    # Input bus data from Excel file "Bus Input Final(Orkney)"
+    # message_api('Input bus data from CSV file "Bus Input Final(Orkney)"')
+    # Input bus data from CSV file "Bus Input Final(Orkney)"
     for index, row in buses.iterrows():
         network.add(
             "Transformer",
@@ -643,9 +638,9 @@ def run_power_flow(network, OUTPUT_FOLDER):
 
 
     # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> TO BE REMOVED 2025-05-26
-    # Save the voltage magnitudes to an Excel file
-    output_file_path = f"{OUTPUT_FOLDER}voltage_levels_after_revision.xlsx"
-    voltage_magnitudes.to_excel(output_file_path, sheet_name="Voltage Levels")
+    # Save the voltage magnitudes to a CSV file
+    output_file_path = f"{OUTPUT_FOLDER}voltage_levels_after_revision.csv"
+    voltage_magnitudes.to_csv(output_file_path)
     # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< TO BE REMOVED 2025-05-26
 
 
@@ -657,20 +652,19 @@ def run_power_flow(network, OUTPUT_FOLDER):
 
     # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> TO BE REMOVED 2025-05-26
     # Define the filename
-    filename = f"{OUTPUT_FOLDER}reactive_power_losses.xlsx"
+    filename = f"{OUTPUT_FOLDER}reactive_power_losses.csv"
 
-    # Save the DataFrame to an Excel file
-    line_losses.to_excel(filename, sheet_name="Reactive Power Losses")
+    # Save the DataFrame to a CSV file
+    line_losses.to_csv(filename)
 
     # Assuming `line_losses` is your DataFrame containing the power losses
     line_losses = network.transformers_t.q0 + network.transformers_t.q1
 
     # Define the filename
-    filename = f"{OUTPUT_FOLDER}reactive_power_losses_transformers.xlsx"
+    filename = f"{OUTPUT_FOLDER}reactive_power_losses_transformers.csv"
 
-    # Save the DataFrame to an Excel file
-    line_losses.to_excel(filename, sheet_name="Reactive Power Losses")
-
+    # Save the DataFrame to a CSV file
+    line_losses.to_csv(filename)
     line_losses = network.transformers_t.q0 + network.transformers_t.q1
 
     network.transformers_t.q1
