@@ -52,11 +52,20 @@ class Paths():
 
     def __init__(self, verbose=True):
 
-        # Initialise `dres` object with data_root location
-        cfg = get_or_create_config()
-        self.data_root = Path(cfg['paths']['data_root'])
-        self.inputs = self.data_root / 'inputs'
-        self.outputs = self.data_root / 'outputs'
+        DATA_PATH_MODE = os.getenv("DATA_PATH_MODE", 'local')
+
+        if DATA_PATH_MODE.lower() == "docker":
+            self.data_root = Path('data')
+            self.inputs = self.data_root / 'inputs'
+            self.outputs = self.data_root / 'outputs'
+        elif DATA_PATH_MODE.lower() == "local":
+            # Initialise `dres` object with data_root location
+            cfg = get_or_create_config()
+            self.data_root = Path(cfg['paths']['data_root'])
+            self.inputs = self.data_root / 'inputs'
+            self.outputs = self.data_root / 'outputs'
+        else:
+            raise ValueError("DATA_PATH_MODE environment variable must be set to either 'local' or 'docker'")
 
         # Determine whether Windows or Unix
         if os.name == 'nt':
