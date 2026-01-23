@@ -46,11 +46,11 @@ def create_bus_network(network, sim):
     network.add("Carrier", "AC")
 
     # Read Excel file for bus input
-    file_path = os.path.join(sim.INPUT_FOLDER,"Bus_Input.csv")
+    file_path = os.path.join(sim.paths.inputs,"Bus_Input.csv")
     buses = pd.read_csv(file_path)
 
     # Input bus data from the DataFrame
-    if sim.legacy:
+    if sim.params.legacy:
         for index, row in buses.iterrows():
             network.add(
                 "Bus",
@@ -81,10 +81,10 @@ def create_transmission_network(network, sim):
 
     # Read Excel file for Transmission Line input
     filename = 'Transmission_input.csv'
-    full_filename = os.path.join(sim.INPUT_FOLDER, filename)
+    full_filename = os.path.join(sim.paths.inputs, filename)
     df = pd.read_csv(full_filename)
 
-    if sim.legacy:
+    if sim.params.legacy:
         for index, row in df.iterrows():
             network.add(
                 "Line",
@@ -121,7 +121,7 @@ def add_loads_to_network(network, sim):
     t0 = performance()
 
     # Load the data from the Excel file for load profiles
-    file_path_load = os.path.join(sim.INPUT_FOLDER,"Load_Profile.csv")
+    file_path_load = os.path.join(sim.paths.inputs,"Load_Profile.csv")
     df = pd.read_csv(file_path_load)
     df.DateTime = pd.to_datetime(df.DateTime)
 
@@ -129,11 +129,11 @@ def add_loads_to_network(network, sim):
     df.set_index("DateTime", inplace=True)
 
     # Select specific date range from data (using `start_date` and `end_date`)
-    df = df.loc[sim.start_date:sim.end_date]
+    df = df.loc[sim.params.start_date:sim.params.end_date]
 
     # vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  ENVIRONMENT VARIABLE (int:17)  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
     # Split the DataFrame into active and reactive power DataFrames
-    active_power_df = df.iloc[:, :17]*sim.rescale_load  # First 17 columns are active power
+    active_power_df = df.iloc[:, :17]*sim.params.rescale_load  # First 17 columns are active power
     reactive_power_df = df.iloc[:, 17:]  # Next 17 columns are reactive power
     # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ENVIRONMENT VARIABLE (int:17)  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -188,7 +188,7 @@ def add_wind_turbines_to_network(network, sim, weather_state, storm_wind_speeds)
 
         # Read wind turbine data
         fullfilename = os.path.join(
-            sim.INPUT_FOLDER, sim.assets['WindFarms'][wind_farm]['file'])
+            sim.paths.inputs, sim.assets['WindFarms'][wind_farm]['file'])
         wind_turbine_data = pd.read_csv(fullfilename)
 
         # Set the 'DateTime' column as the index
@@ -196,7 +196,7 @@ def add_wind_turbines_to_network(network, sim, weather_state, storm_wind_speeds)
         wind_turbine_data.set_index("DateTime", inplace=True)
 
         # Select specific date range from data (using `start_date` and `end_date`)
-        wind_turbine_data = wind_turbine_data.loc[sim.start_date:sim.end_date]
+        wind_turbine_data = wind_turbine_data.loc[sim.params.start_date:sim.params.end_date]
 
         
         # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -317,7 +317,7 @@ def define_transformers(network, sim):
     file_path = (
         # message_api('Update this with the correct file path')
         # Update this with the correct file path
-        os.path.join(sim.INPUT_FOLDER,"Transformer_types_definition.xlsx")
+        os.path.join(sim.paths.inputs,"Transformer_types_definition.xlsx")
     )
     df = pd.read_excel(file_path)
 
@@ -455,7 +455,7 @@ def add_offshore_marine_to_network(network, sim):
     EDAY_tidal_power = 7.6  # MW, replace with actual power value
     EDAY_tidal_reactive_power = 2.50  # MVar PF = 0.95
 
-    if sim.legacy:
+    if sim.params.legacy:
         network.add(
             "Generator",
             name="EMEC Tidal Generator",
@@ -512,7 +512,7 @@ def add_offshore_marine_to_network(network, sim):
     # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  HARD-CODED CONTEXT (TBC)  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     # vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  HARD-CODED CONTEXT (TBC)  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    if sim.legacy:
+    if sim.params.legacy:
         network.add(
             "Generator",
             name="Wave Generator",
@@ -543,7 +543,7 @@ def add_offshore_marine_to_network(network, sim):
 
 def add_control(network, sim):
     t0 = performance()
-    if sim.legacy:
+    if sim.params.legacy:
         network.generators.loc["Slack_generator", "control"] = "Slack"
     else:
         None

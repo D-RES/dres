@@ -22,33 +22,6 @@ from datetime import datetime
 
 ###############################################################################################################
 
-def IO_file_paths(data_root=None, input_dir="inputs"):
-    
-    # Identify file paths for IO data
-    if data_root is None:
-        # Use default path locations
-        if os.name == "nt":
-            # If Windows (i.e. IPython)
-            INPUT_FOLDER = "../DATA/inputs"
-            OUTPUT_FOLDER = "../DATA/outputs"
-        else:
-            # If Unix (i.e. Local Docker container (can be on Windows parent system) or DAFNI)
-            INPUT_FOLDER = "/data/inputs"
-            OUTPUT_FOLDER = "/data/outputs"
-    else:
-        INPUT_FOLDER = os.path.join(data_root,input_dir)
-        OUTPUT_FOLDER = os.path.join(data_root,"outputs")
-
-    # Check if paths exist
-    try:
-        os.listdir(INPUT_FOLDER)
-        os.listdir(OUTPUT_FOLDER)
-    except: 
-        print("Failed to find default IO data file paths (e.g. ../DATA/inputs and/or ../DATA/outputs). Please specify `data_root='path_to_my_data'` or place data in default path.")
-        message_api(msg="Failed to find default IO data file paths (e.g. ../DATA/inputs and/or ../DATA/outputs). Please specify `data_root='path_to_my_data'` or place data in default path.")
-        
-
-    return INPUT_FOLDER, OUTPUT_FOLDER
 
 
 def performance(t0=None, msg="", always_verbose=False, verbose=False):

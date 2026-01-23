@@ -20,58 +20,45 @@ import os
 import numpy as np
 import json
 import pandas as pd
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Custom Libraries
+import dres
 import dres.base_model as base_model
 import dres.ev_optimise as ev_optimise
 from dres.dafni_utilities import performance, message_api, generate_run_metadata
 from dres.DRES_Sim import DRES_Sim
 
 
+
 ###############################################################################################################
 
 # %%
-sim = DRES_Sim(
-    ev_model = "include_evs",
-    start_date = '2019-01-07',
-    end_date = '2019-01-07',
-    charging_price = "[148.7,127.4,125.3,111.5,112.1,125.4,141.1,161.2,156.2,158.8,153.7,144.9,146.8,141.8,136.2,136.7,295.6,298.6,282.2,163.8,147.8,137.7,125.3,120.3]",
-    discharging_price = "[148.7,127.4,125.3,111.5,112.1,125.4,141.1,161.2,156.2,158.8,153.7,144.9,146.8,141.8,136.2,136.7,295.6,298.6,282.2,163.8,147.8,137.7,125.3,120.3]",
-    pop_size = 3,
-    max_iter = 3,
-    initial_soc = 0.3,
-    delta_t = 1,
-    capacity = 16.45,
-    min_soc = 0.1,
-    max_soc = 0.9,
-    vehicle_power = 0.011,
-    data_root='../../DATA',
-    #input_dir="inputs_KQ_20250601_verify", # default is "input"
-    #output_dir="outputs_verify", # default is "output"
-    #legacy=True,
-)
+sim = dres.go()
 
 
 ###############################################################################################################
-
 
 # %% 
 # Build baseline power network model
 network = sim.build_baseline_model()
-network.export_to_netcdf(os.path.join(sim.OUTPUT_FOLDER, "base_net0.nc"))
-base_model.add_enhanced_storage_to_network(network)
+# network.export_to_netcdf(os.path.join(sim.paths.outputs, "base_net0.nc"))
+# base_model.add_enhanced_storage_to_network(network)
 base_model.add_control(network, sim)
-network.export_to_netcdf(os.path.join(sim.OUTPUT_FOLDER, "base_net.nc"))
+# network.export_to_netcdf(os.path.join(sim.paths.outputs, "base_net.nc"))
 
 ###############################################################################################################
 
 
 # %% 
 # Run baseline power network model
-network = base_model.run_power_flow(network, sim.OUTPUT_FOLDER)
+network = base_model.run_power_flow(network, sim.paths.outputs)
 
 
-###############################################################################################################
+###########################################################################################################
 
 
 # %% 
@@ -81,16 +68,16 @@ if sim.ev_model == "exclude_evs":
     # Log performance
     t1 = performance(t0=sim.t0, msg="FULL MODEL RUN COMPLETE", always_verbose=True)
 
-    network.export_to_netcdf(os.path.join(sim.OUTPUT_FOLDER, "network.nc"))
+    network.export_to_netcdf(os.path.join(sim.paths.outputs, "network.nc"))
 
     generate_run_metadata({
         'machine_id': sim.machine_id,
-        'model_version':'v0.2.5',
+        'model_version':'v0.3.1',
         'ev_model': sim.ev_model,
         'start_date': sim.start_date,
         'end_date': sim.end_date,
         'compute_time': f"finished in {t1 - sim.t0 :0.4f} seconds"
-    }, sim.OUTPUT_FOLDER)
+    }, sim.paths.outputs)
 
     if os.name != "nt":
         # As running on Linux, assume Docker, and exit process
@@ -98,7 +85,7 @@ if sim.ev_model == "exclude_evs":
 
 # %% 
 # 4.1 EV Usage and Scheduling Setup
-lb_array, ub_array, delta_soc, vehicle_power, connected_cars = ev_optimise.ev_scheduling_setup(sim.INPUT_FOLDER, 'processed_ev_usage.csv')
+lb_array, ub_array, delta_soc, vehicle_power, connected_cars = ev_optimise.ev_scheduling_setup(sim.paths.inputs, 'processed_ev_usage.csv')
 
 
 # %% 
@@ -131,7 +118,7 @@ message_api(msg=f"Pareto Front Solutions:")
 
 # %% 
 # 4.4 Saving and Plotting Pareto Front Results
-ev_optimise.save_pareto_front(pareto_front, filename=os.path.join(sim.OUTPUT_FOLDER,"pareto_front_extreme_V2G.csv"))
+ev_optimise.save_pareto_front(pareto_front, filename=os.path.join(sim.paths.outputs,"pareto_front_extreme_V2G.csv"))
 
 
 # %% 
@@ -194,7 +181,7 @@ message_api(line_losses)
 
 bus_voltage = network.buses_t.v_mag_pu
 bus_list = ['KIRKWA3A']
-bus_voltage.to_csv(f'{sim.OUTPUT_FOLDER}bus_voltage_data_extremeonedayV2G.csv')
+bus_voltage.to_csv(f'{sim.paths.outputs}bus_voltage_data_extremeonedayV2G.csv')
 
 """
 plt.figure(figsize=(10,6))
@@ -273,7 +260,7 @@ for t, power in enumerate(optimal_power_schedule):
 # We can save the best result found during optimization to JSON for future runs as an initial guess.
 # 
 
-def save_optimal_result(optimal_result, filename=f"{sim.OUTPUT_FOLDER}best_result_oneday_extreme_V2G.json"):
+def save_optimal_result(optimal_result, filename=f"{sim.paths.outputs}best_result_oneday_extreme_V2G.json"):
     with open(filename, 'w') as file:
         json.dump(optimal_result.tolist(), file)
     message_api(f"Optimal result saved to {filename}")
@@ -393,11 +380,11 @@ message_api(msg=f"EV CO2 emission:{total_co2}")
 # Log performance
 t1 = performance(t0=sim.t0, msg="FULL MODEL RUN COMPLETE", always_verbose=True)
 
-network.export_to_netcdf(os.path.join(sim.OUTPUT_FOLDER, "network.nc"))
+network.export_to_netcdf(os.path.join(sim.paths.outputs, "network.nc"))
 
 generate_run_metadata({
     'machine_id': sim.machine_id,
-    'model_version':'v0.2.5',
+    'model_version':'v0.3.1',
     'ev_model': sim.ev_model,
     'start_date': sim.start_date,
     'end_date': sim.end_date,
@@ -412,6 +399,6 @@ generate_run_metadata({
     'max_soc': sim.max_soc,
     'vehicle_power': sim.vehicle_power,
     'compute_time': f"finished in {t1 - sim.t0 :0.4f} seconds"
-}, sim.OUTPUT_FOLDER)
+}, sim.paths.outputs)
 
 # %%
