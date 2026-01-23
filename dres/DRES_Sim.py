@@ -175,7 +175,6 @@ class DRES_Sim():
         slack_p_nom=None
 
         network = base_model.create_pypsa_network()
-        """
         base_model.create_bus_network(network, self)
         base_model.create_transmission_network(network, self)
         base_model.add_loads_to_network(network, self)
@@ -185,7 +184,6 @@ class DRES_Sim():
         base_model.define_transformers(network, self)
         base_model.add_shunts_to_network(network, self)
         base_model.add_offshore_marine_to_network(network, self)
-        """
 
         return network
 
