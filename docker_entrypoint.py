@@ -64,18 +64,18 @@ network = base_model.run_power_flow(network, sim.paths.outputs)
 # %% 
 # Optimal EV scheduling (main process)
 
-if sim.ev_model == "exclude_evs":
+if sim.params.ev_model == "exclude_evs":
     # Log performance
     t1 = performance(t0=sim.t0, msg="FULL MODEL RUN COMPLETE", always_verbose=True)
 
     network.export_to_netcdf(os.path.join(sim.paths.outputs, "network.nc"))
 
     generate_run_metadata({
-        'machine_id': sim.machine_id,
+        'machine_id': sim.paths.machine_id,
         'model_version':'v0.3.1',
-        'ev_model': sim.ev_model,
-        'start_date': sim.start_date,
-        'end_date': sim.end_date,
+        'ev_model': sim.params.ev_model,
+        'start_date': sim.params.start_date,
+        'end_date': sim.params.end_date,
         'compute_time': f"finished in {t1 - sim.t0 :0.4f} seconds"
     }, sim.paths.outputs)
 
@@ -91,21 +91,21 @@ lb_array, ub_array, delta_soc, vehicle_power, connected_cars = ev_optimise.ev_sc
 # %% 
 # 4.3 Running the GWO Optimization
 gwo = ev_optimise.GWO(
-    pop_size = sim.pop_size,
+    pop_size = sim.params.pop_size,
     dim = len(network.loads_t['p_set'].index),
-    max_iter = sim.max_iter,
+    max_iter = sim.params.max_iter,
     lb_array = lb_array,
     ub_array = ub_array,
-    initial_soc = sim.initial_soc,
-    delta_t = sim.delta_t,
-    capacity = sim.capacity,
-    min_soc = sim.min_soc,
-    max_soc = sim.max_soc,
-    charging_price = sim.charging_price,
-    discharging_price = sim.discharging_price,
+    initial_soc = sim.params.initial_soc,
+    delta_t = sim.params.delta_t,
+    capacity = sim.params.capacity,
+    min_soc = sim.params.min_soc,
+    max_soc = sim.params.max_soc,
+    charging_price = sim.params.charging_price,
+    discharging_price = sim.params.discharging_price,
     delta_soc = delta_soc,
     network = network,
-    vehicle_power = sim.vehicle_power
+    vehicle_power = sim.params.vehicle_power
 )
 
 pareto_front = gwo.optimize()
@@ -237,18 +237,18 @@ car_charging_cost = 0.0
 car_discharging_revenue = 0.0
 for i, power in enumerate(optimal_power_schedule):
     if power < 0:  # charging
-        car_charging_cost += abs(power) * sim.charging_price[i]
+        car_charging_cost += abs(power) * sim.params.charging_price[i]
     else:  # discharging
-        car_discharging_revenue += abs(power) * sim.discharging_price[i]
+        car_discharging_revenue += abs(power) * sim.params.discharging_price[i]
 
 message_api(msg=f"Total charging cost :{car_charging_cost}")
 message_api(msg=f"Total discharging revenue :{car_discharging_revenue}")
 
 # Calculate SOC over time:
-soc_values = [sim.initial_soc]
-soc = sim.initial_soc
+soc_values = [sim.params.initial_soc]
+soc = sim.params.initial_soc
 for t, power in enumerate(optimal_power_schedule):
-    soc -= (power*sim.delta_t)/sim.capacity
+    soc -= (power*sim.params.delta_t)/sim.params.capacity
     soc += delta_soc[t]
     soc_values.append(soc)
 
@@ -383,21 +383,21 @@ t1 = performance(t0=sim.t0, msg="FULL MODEL RUN COMPLETE", always_verbose=True)
 network.export_to_netcdf(os.path.join(sim.paths.outputs, "network.nc"))
 
 generate_run_metadata({
-    'machine_id': sim.machine_id,
+    'machine_id': sim.paths.machine_id,
     'model_version':'v0.3.1',
-    'ev_model': sim.ev_model,
-    'start_date': sim.start_date,
-    'end_date': sim.end_date,
-    'charging_price': sim.charging_price,
-    'discharging_price': sim.discharging_price,
-    'pop_size': sim.pop_size,
-    'max_iter': sim.max_iter,
-    'initial_soc': sim.initial_soc,
-    'delta_t': sim.delta_t,
-    'capacity': sim.capacity,
-    'min_soc': sim.min_soc,
-    'max_soc': sim.max_soc,
-    'vehicle_power': sim.vehicle_power,
+    'ev_model': sim.params.ev_model,
+    'start_date': sim.params.start_date,
+    'end_date': sim.params.end_date,
+    'charging_price': sim.params.charging_price,
+    'discharging_price': sim.params.discharging_price,
+    'pop_size': sim.params.pop_size,
+    'max_iter': sim.params.max_iter,
+    'initial_soc': sim.params.initial_soc,
+    'delta_t': sim.params.delta_t,
+    'capacity': sim.params.capacity,
+    'min_soc': sim.params.min_soc,
+    'max_soc': sim.params.max_soc,
+    'vehicle_power': sim.params.vehicle_power,
     'compute_time': f"finished in {t1 - sim.t0 :0.4f} seconds"
 }, sim.paths.outputs)
 
