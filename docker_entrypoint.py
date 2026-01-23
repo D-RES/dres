@@ -45,10 +45,10 @@ sim = dres.go()
 # %% 
 # Build baseline power network model
 network = sim.build_baseline_model()
-# network.export_to_netcdf(os.path.join(sim.paths.outputs, "base_net0.nc"))
+network.export_to_netcdf(os.path.join(sim.paths.outputs, "base_net0.nc"))
 # base_model.add_enhanced_storage_to_network(network)
 base_model.add_control(network, sim)
-# network.export_to_netcdf(os.path.join(sim.paths.outputs, "base_net.nc"))
+network.export_to_netcdf(os.path.join(sim.paths.outputs, "base_net.nc"))
 
 ###############################################################################################################
 

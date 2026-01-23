@@ -14,10 +14,8 @@ ENV DATA_PATH_MODE=docker
 
 ##  MOVE INPUT DATA DIRECTORY
 #  TESTING ONLY (DOCKER DESKTOP) >>>>>>
-ENV INPUT_DATA_PATH=$INPUT_DATA_PATH
-COPY ${INPUT_DATA_PATH} /data/inputs/
+COPY --from=inputs / /data/inputs/
 COPY .env ./home/
-
 #  TESTING ONLY (DOCKER DESKTOP) <<<<<<
 
 
