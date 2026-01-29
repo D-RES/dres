@@ -25,8 +25,8 @@ def plot_departure_histogram(dres, bin_minutes=1, ev_id=None, include_heatmap=Tr
     if ev_id is not None:
         df = dres.ev.schedule_data[dres.ev.schedule_data['ev_id'] == ev_id]
     
-    if dres.ev.schedule_type not in ["journey_schedule", "charge_event_schedule"]:
-        raise ValueError("EV schedule type must be 'journey_schedule' or 'charge_event_schedule'.")
+    if dres.ev.schedule_type not in ["journey_events", "charge_event_schedule"]:
+        raise ValueError("EV schedule type must be 'journey_events' or 'charge_event_schedule'.")
     
     # Normalize times to reference date for histogram
     reference_date = datetime(2019, 1, 1)
@@ -37,7 +37,7 @@ def plot_departure_histogram(dres, bin_minutes=1, ev_id=None, include_heatmap=Tr
                           for t in pd.to_datetime(df['charge_event_start'])]
         arrival_times = [datetime.combine(reference_date.date(), t.time()) 
                         for t in pd.to_datetime(df['charge_event_end'])]
-    elif dres.ev.schedule_type == "journey_schedule":
+    elif dres.ev.schedule_type == "journey_events":
         ## LEGACY EV DATASET HANDLING >>>
         # Ensure datetime objects (extract time component only, normalized to a reference date)
         departure_times = [datetime.combine(reference_date.date(), t.time()) 
@@ -121,7 +121,7 @@ def plot_departure_histogram(dres, bin_minutes=1, ev_id=None, include_heatmap=Tr
         arrival_datetime = df['charge_event_end']
         color_bar_text = 'Hours per day, charging'
 
-    elif dres.ev.schedule_type == "journey_schedule":
+    elif dres.ev.schedule_type == "journey_events":
         departure_datetime = df['Departure DateTime']
         arrival_datetime = df['Arrival DateTime']
         color_bar_text = 'Hours per day, unplugged'
@@ -203,7 +203,7 @@ def ev_charge_rate(dres, ev_id=None):
     else:
         df = dres.ev.schedule_data
 
-    if dres.ev.schedule_type == "journey_schedule":
+    if dres.ev.schedule_type == "journey_events":
         dt_minutes = (df['Arrival DateTime'] - df['Departure DateTime']).dt.total_seconds()/60
 
         ev_charge_rate = (df['SOC on Departure'] - df['SOC on Arrival']) / dt_minutes
@@ -245,7 +245,7 @@ def ev_soc_timeline(dres, max_ev_charge_rate, ev_id=None):
     else:
         df = dres.ev.schedule_data
 
-    if dres.ev.schedule_type == "journey_schedule":
+    if dres.ev.schedule_type == "journey_events":
         ev_batt_capacity = max(df['SOC on Departure'])
 
         ev_timeline_dt = []

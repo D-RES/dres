@@ -12,7 +12,7 @@ RUN mkdir -p /data/inputs/
 ENV DATA_PATH_MODE=docker
 
 
-##  MOVE INPUT DATA DIRECTORY
+##  MOUNT INPUT DATA FROM LOCAL SYSTEM TO DOCKER CONTAINER (`intputs` is configured in `docker.py`, using config file)
 #  TESTING ONLY (DOCKER DESKTOP) >>>>>>
 COPY --from=inputs / /data/inputs/
 COPY .env ./home/

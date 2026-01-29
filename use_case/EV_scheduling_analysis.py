@@ -12,7 +12,7 @@ import dres
 
 # %%
 sim = dres.go()
-sim.ev.load_ev_data(ev_data_file='ev_schedule_data_reflex.csv') # Load
+sim.ev.load_ev_data(ev_data_file='ev_schedule_data_reflex.csv', type_of_schedule='charge_event') # Load
 sim.ev.schedule_data                                            # View all data
 
 # %% [markdown]
@@ -28,7 +28,7 @@ sim.ev.schedule_data                                            # View all data
 # We can choose to load specific EV data, to inspect what it contains, before use this data:
 
 # %%
-sim.ev.load_ev_data(ev_data_file='processed_ev_usage.csv')      # Load
+sim.ev.load_ev_data(ev_data_file='processed_ev_usage.csv', type_of_schedule='journey')      # Load
 sim.ev.schedule_data                                            # View all data
 
 # %% [markdown]
@@ -51,7 +51,7 @@ sim.plots.ev.plot_departure_histogram()
 # This does not account for smart charging (i.e. this routine may under-estimate the CR on occasions where the charging process is interrupted by a control signal, but it cannot over-estimate the CR); however, if we find a notable distribution of high-valued CR on the right-hand side of the histogram, this gives a good estimate of the maximum CR.
 
 # %%
-sim.ev.load_ev_data(ev_data_file='processed_ev_usage.csv')      # Load
+sim.ev.load_ev_data(ev_data_file='processed_ev_usage.csv', type_of_schedule='journey')      # Load
 sim.plots.ev.ev_charge_rate()
 
 # %% [markdown]
@@ -72,7 +72,7 @@ sim.plots.ev.ev_soc_timeline(max_ev_charge_rate)
 
 # %%
 sim_reflex = dres.go()
-sim_reflex.ev.load_ev_data(ev_data_file='ev_schedule_data_reflex.csv') # Load
+sim_reflex.ev.load_ev_data(ev_data_file='ev_schedule_data_reflex.csv', type_of_schedule='charge_event') # Load
 sim_reflex.ev.schedule_data                                            # View all data
 
 # %%

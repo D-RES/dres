@@ -13,16 +13,18 @@ class EV():
         self.schedule_type = "unknown"
         
     
-    def load_ev_data(self, ev_data_file=None):
+    def load_ev_data(self, *, ev_data_file, type_of_schedule):
         """Quick load of EV data."""
         
         t0 = performance()
 
         # Parsing options
-        if ev_data_file == "processed_ev_usage.csv":
-            spaghetti_model = True
-        else:
-            spaghetti_model = False
+        schedule_type = type_of_schedule.strip().lower()
+        if schedule_type not in {"journey_events", "charge_events"}:
+            raise ValueError(
+                "type_of_schedule must be 'journey_events' or 'charge_events'"
+            )
+        spaghetti_model = schedule_type == "journey_events"
 
         # Full path to file
         full_filename = os.path.join(self.parent.paths.inputs, ev_data_file)
@@ -43,7 +45,7 @@ class EV():
             }
 
             df = df.rename(columns=rename_map)
-            self.schedule_type = "journey_schedule"
+            self.schedule_type = "journey_events"
 
         else:
             # Data
