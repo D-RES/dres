@@ -34,9 +34,9 @@ def plot_departure_histogram(dres, bin_minutes=1, ev_id=None, include_heatmap=Tr
     if dres.ev.schedule_type == "charge_events":
         # Extract time component and normalize to reference date
         departure_times = [datetime.combine(reference_date.date(), t.time()) 
-                          for t in pd.to_datetime(df['charge_event_start'])]
+                          for t in pd.to_datetime(df['datetime_charge_start'])]
         arrival_times = [datetime.combine(reference_date.date(), t.time()) 
-                        for t in pd.to_datetime(df['charge_event_end'])]
+                        for t in pd.to_datetime(df['dateime_charge_end'])]
     elif dres.ev.schedule_type == "journey_events":
         ## LEGACY EV DATASET HANDLING >>>
         # Ensure datetime objects (extract time component only, normalized to a reference date)
@@ -117,8 +117,8 @@ def plot_departure_histogram(dres, bin_minutes=1, ev_id=None, include_heatmap=Tr
     
     # 
     if dres.ev.schedule_type == "charge_events":
-        departure_datetime = pd.to_datetime(df['charge_event_start'])
-        arrival_datetime = pd.to_datetime(df['charge_event_end'])
+        departure_datetime = pd.to_datetime(df['datetime_charge_start'])
+        arrival_datetime = pd.to_datetime(df['dateime_charge_end'])
         color_bar_text = 'Hours per day, charging'
 
     elif dres.ev.schedule_type == "journey_events":
@@ -206,13 +206,13 @@ def ev_charge_rate(dres, ev_id=None):
     if dres.ev.schedule_type == "journey_events":
         dt_minutes = (df['datetime_on_arrival'] - df['datetime_on_departure']).dt.total_seconds()/60
 
-        ev_charge_rate = (df['SOC on Departure'] - df['SOC on Arrival']) / dt_minutes
+        ev_charge_rate = (df['soc_on_departure'] - df['soc_on_arrival']) / dt_minutes
         max_ev_charge_rate = np.max(ev_charge_rate)
         bin_size=0.0000005
     elif dres.ev.schedule_type == "charge_events":
-        dt_minutes = (df['charge_event_end'] - df['charge_event_start']).dt.total_seconds()/60
+        dt_minutes = (df['dateime_charge_end'] - df['datetime_charge_start']).dt.total_seconds()/60
 
-        ev_charge_rate = (df['charge_event_end_soc'] - df['charge_event_start_soc']) / dt_minutes
+        ev_charge_rate = (df['soc_end'] - df['soc_start']) / dt_minutes
         max_ev_charge_rate = np.max(ev_charge_rate)
         bin_size=0.00005
 
@@ -246,13 +246,13 @@ def ev_soc_timeline(dres, max_ev_charge_rate, ev_id=None):
         df = dres.ev.schedule_data
 
     if dres.ev.schedule_type == "journey_events":
-        ev_batt_capacity = max(df['SOC on Departure'])
+        ev_batt_capacity = max(df['soc_on_departure'])
 
         ev_timeline_dt = []
         ev_timeline_soc = []
 
         ev_timeline_dt.append(pd.to_datetime('2019-01-01 00:00'))
-        ev_timeline_soc.append(df['SOC on Departure'].iloc[0])
+        ev_timeline_soc.append(df['soc_on_departure'].iloc[0])
 
         for (i, row) in df.iterrows():
             dt = row['datetime_on_departure'] - ev_timeline_dt[-1]
@@ -266,56 +266,56 @@ def ev_soc_timeline(dres, max_ev_charge_rate, ev_id=None):
             if full_charge_achieved_before_departure and i != 0:
                 # Evaluate the point in time during charge that capacity is reached (i.e. before 'datetime_on_departure')
                 ev_timeline_dt.append(time_at_max_charge)
-                # Ensure the 'SOC on Departure' is not exceeded during charge
-                ev_timeline_soc.append(np.min([ev_batt_capacity, row['SOC on Departure']]))
+                # Ensure the 'soc_on_departure' is not exceeded during charge
+                ev_timeline_soc.append(np.min([ev_batt_capacity, row['soc_on_departure']]))
 
             ev_timeline_dt.append(row['datetime_on_departure'])
-            ev_timeline_soc.append(row['SOC on Departure'])
+            ev_timeline_soc.append(row['soc_on_departure'])
             ev_timeline_dt.append(row['datetime_on_departure'] + pd.Timedelta(seconds=1))
             ev_timeline_soc.append(0)
             ev_timeline_dt.append(row['datetime_on_arrival'] - pd.Timedelta(seconds=1))
             ev_timeline_soc.append(0)
             ev_timeline_dt.append(row['datetime_on_arrival'])
-            ev_timeline_soc.append(row['SOC on Arrival'])
+            ev_timeline_soc.append(row['soc_on_arrival'])
 
     elif dres.ev.schedule_type == "charge_events":
         # Check for NaN values in critical columns
-        if df[['charge_event_start', 'charge_event_end', 'charge_event_start_soc', 'charge_event_end_soc']].isna().any().any():
+        if df[['datetime_charge_start', 'dateime_charge_end', 'soc_start', 'soc_end']].isna().any().any():
             print("DataFrame contains NaN values in critical columns. Please clean the data before proceeding.")
-        df = df.dropna(subset=['charge_event_start', 'charge_event_end', 'charge_event_start_soc', 'charge_event_end_soc'])
+        df = df.dropna(subset=['datetime_charge_start', 'dateime_charge_end', 'soc_start', 'soc_end'])
         
-        ev_batt_capacity = max(df['charge_event_end_soc'])
+        ev_batt_capacity = max(df['soc_end'])
 
         ev_timeline_dt = []
         ev_timeline_soc = []
 
-        ev_timeline_dt.append(df['charge_event_start'].iloc[0])
-        ev_timeline_soc.append(df['charge_event_start_soc'].iloc[0])
+        ev_timeline_dt.append(df['datetime_charge_start'].iloc[0])
+        ev_timeline_soc.append(df['soc_start'].iloc[0])
 
         for (i, row) in df.iterrows():
             # If there's a gap between events, show constant SoC
-            if i > 0 and ev_timeline_dt[-1] < row['charge_event_start']:
+            if i > 0 and ev_timeline_dt[-1] < row['datetime_charge_start']:
                 # Hold previous SoC until next event starts
-                ev_timeline_dt.append(row['charge_event_start'] - pd.Timedelta(seconds=1))
+                ev_timeline_dt.append(row['datetime_charge_start'] - pd.Timedelta(seconds=1))
                 ev_timeline_soc.append(ev_timeline_soc[-1])
 
             # Add charging event
-            ev_timeline_dt.append(row['charge_event_start'])
-            ev_timeline_soc.append(row['charge_event_start_soc'])
+            ev_timeline_dt.append(row['datetime_charge_start'])
+            ev_timeline_soc.append(row['soc_start'])
             
             # Calculate charging with max rate
-            time_to_max_charge = (ev_batt_capacity - row['charge_event_start_soc']) / max_ev_charge_rate
+            time_to_max_charge = (ev_batt_capacity - row['soc_start']) / max_ev_charge_rate
             time_to_max_charge = pd.Timedelta(minutes=time_to_max_charge)
-            time_at_max_charge = time_to_max_charge + row['charge_event_start']
+            time_at_max_charge = time_to_max_charge + row['datetime_charge_start']
 
             # Check if full charge achieved before event end
-            full_charge_achieved_before_end = time_at_max_charge < row['charge_event_end']
+            full_charge_achieved_before_end = time_at_max_charge < row['dateime_charge_end']
             if full_charge_achieved_before_end:
                 ev_timeline_dt.append(time_at_max_charge)
-                ev_timeline_soc.append(np.min([ev_batt_capacity, row['charge_event_end_soc']]))
+                ev_timeline_soc.append(np.min([ev_batt_capacity, row['soc_end']]))
             
-            ev_timeline_dt.append(row['charge_event_end'])
-            ev_timeline_soc.append(row['charge_event_end_soc'])
+            ev_timeline_dt.append(row['dateime_charge_end'])
+            ev_timeline_soc.append(row['soc_end'])
 
     ev_timeline = pd.DataFrame({
         'datetime': ev_timeline_dt,

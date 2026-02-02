@@ -44,31 +44,15 @@ class EV():
         df = df[[col for col in df.columns if col in column_mapping.keys()]].copy()
         df.rename(columns=column_mapping, inplace=True)
 
-        if self.schedule_type == "charge_events":
-            # Data
+        # Determine if we need to evaluate end datetime from start+duration
+        evaluate_datetime_end_from_duration = self.parent.simulation_config['EV_schedule_data'].get('evaluate_datetime_end_from_duration', False)
+        if evaluate_datetime_end_from_duration:
             # Evaluate DateTime and Duration columns
-            df['ChargeEventStartDate'] = pd.to_datetime(df['ChargeEventStartDate'], format='%d/%m/%Y %I:%M:%S %p')
-            df['ChargeEventDuration'] = pd.to_timedelta(df['ChargeEventDuration'])
-            df['ChargeEventEndDate'] = df['ChargeEventStartDate'] + df['ChargeEventDuration']
+            df['datetime_charge_start'] = pd.to_datetime(df['datetime_charge_start'], format='%d/%m/%Y %I:%M:%S %p')
+            df['time_charge_duration'] = pd.to_timedelta(df['time_charge_duration'])
+            df['dateime_charge_end'] = df['datetime_charge_start'] + df['time_charge_duration']
 
-            column_name_mappings = {
-                'DeviceName': 'ev_id',
-                'ChargeEventStartDate': 'charge_event_start',
-                'ChargeEventEndDate': 'charge_event_end',
-                'ChargeEventStartCharge': 'charge_event_start_soc',
-                'ChargeEventEndCharge': 'charge_event_end_soc',
-            }
-
-            df = df.rename(columns=column_name_mappings)
-            df = df[['ev_id', 'charge_event_start', 'charge_event_end', 'charge_event_start_soc', 'charge_event_end_soc']].copy()
-            """
-            df = df[['DeviceName', 'ChargeEventStartDate', 'ChargeEventEndDate', 'ChargeEventStartCharge', 'ChargeEventEndCharge']].copy()
-            """
-            self.schedule_type = "charge_event_schedule"
-
-        elif self.schedule_type == "soc_timeline":
-            None
-
+            
         if 'include_date_datum' in self.parent.simulation_config['EV_schedule_data']:
             if "datetime" in df.columns:
                 base_date = pd.Timestamp(self.parent.simulation_config['EV_schedule_data']['include_date_datum'])
@@ -78,6 +62,11 @@ class EV():
                     unit="s",
                     origin=base_date
                 )
+
+        # Convert all datetime columns to datetime format
+        datetime_columns = [col for col in df.columns if "datetime" in col.lower()]
+        for col in datetime_columns:
+            df[col] = pd.to_datetime(df[col], errors="coerce")
                 
         self.schedule_data = df
         performance(t0)

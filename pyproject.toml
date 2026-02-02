@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dres"
-version = "0.3.3.1"
+version = "0.3.3.2"
 description = "A utility package for creating DAFNI-ready PyPSA models. More information about DAFNI (Data & Analytics Facility for National Infrastructure) can be found at https://www.dafni.ac.uk/"
 readme = "README.md"
 license = {text = "GNU v3"}
