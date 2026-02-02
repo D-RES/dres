@@ -12,7 +12,7 @@ def plot_departure_histogram(dres, bin_minutes=1, ev_id=None, include_heatmap=Tr
     Plot histogram of EV departure and arrival times across 24 hours.
     
     Args:
-        df: DataFrame with 'Departure DateTime' and 'Arrival DateTime' columns
+        df: DataFrame with 'datetime_on_departure' and 'datetime_on_arrival' columns
         bin_minutes: Resolution of histogram bins in minutes (default: 1)
         include_heatmap: If True, adds journey duration heatmap as third subplot
     
@@ -25,13 +25,13 @@ def plot_departure_histogram(dres, bin_minutes=1, ev_id=None, include_heatmap=Tr
     if ev_id is not None:
         df = dres.ev.schedule_data[dres.ev.schedule_data['ev_id'] == ev_id]
     
-    if dres.ev.schedule_type not in ["journey_events", "charge_event_schedule"]:
-        raise ValueError("EV schedule type must be 'journey_events' or 'charge_event_schedule'.")
+    if dres.ev.schedule_type not in ["journey_events", "charge_events"]:
+        raise ValueError("EV schedule type must be 'journey_events' or 'charge_events'.")
     
     # Normalize times to reference date for histogram
     reference_date = datetime(2019, 1, 1)
     
-    if dres.ev.schedule_type == "charge_event_schedule":
+    if dres.ev.schedule_type == "charge_events":
         # Extract time component and normalize to reference date
         departure_times = [datetime.combine(reference_date.date(), t.time()) 
                           for t in pd.to_datetime(df['charge_event_start'])]
@@ -41,9 +41,9 @@ def plot_departure_histogram(dres, bin_minutes=1, ev_id=None, include_heatmap=Tr
         ## LEGACY EV DATASET HANDLING >>>
         # Ensure datetime objects (extract time component only, normalized to a reference date)
         departure_times = [datetime.combine(reference_date.date(), t.time()) 
-                        for t in pd.to_datetime(df["Departure DateTime"])]
+                        for t in pd.to_datetime(df["datetime_on_departure"])]
         arrival_times = [datetime.combine(reference_date.date(), t.time()) 
-                        for t in pd.to_datetime(df["Arrival DateTime"])]
+                        for t in pd.to_datetime(df["datetime_on_arrival"])]
         ## <<< LEGACY EV DATASET HANDLING
 
 
@@ -116,14 +116,14 @@ def plot_departure_histogram(dres, bin_minutes=1, ev_id=None, include_heatmap=Tr
     ))
     
     # 
-    if dres.ev.schedule_type == "charge_event_schedule":
-        departure_datetime = df['charge_event_start']
-        arrival_datetime = df['charge_event_end']
+    if dres.ev.schedule_type == "charge_events":
+        departure_datetime = pd.to_datetime(df['charge_event_start'])
+        arrival_datetime = pd.to_datetime(df['charge_event_end'])
         color_bar_text = 'Hours per day, charging'
 
     elif dres.ev.schedule_type == "journey_events":
-        departure_datetime = df['Departure DateTime']
-        arrival_datetime = df['Arrival DateTime']
+        departure_datetime = pd.to_datetime(df['datetime_on_departure'])
+        arrival_datetime = pd.to_datetime(df['datetime_on_arrival'])
         color_bar_text = 'Hours per day, unplugged'
 
     # Prepare heatmap data
@@ -204,12 +204,12 @@ def ev_charge_rate(dres, ev_id=None):
         df = dres.ev.schedule_data
 
     if dres.ev.schedule_type == "journey_events":
-        dt_minutes = (df['Arrival DateTime'] - df['Departure DateTime']).dt.total_seconds()/60
+        dt_minutes = (df['datetime_on_arrival'] - df['datetime_on_departure']).dt.total_seconds()/60
 
         ev_charge_rate = (df['SOC on Departure'] - df['SOC on Arrival']) / dt_minutes
         max_ev_charge_rate = np.max(ev_charge_rate)
         bin_size=0.0000005
-    elif dres.ev.schedule_type == "charge_event_schedule":
+    elif dres.ev.schedule_type == "charge_events":
         dt_minutes = (df['charge_event_end'] - df['charge_event_start']).dt.total_seconds()/60
 
         ev_charge_rate = (df['charge_event_end_soc'] - df['charge_event_start_soc']) / dt_minutes
@@ -255,30 +255,30 @@ def ev_soc_timeline(dres, max_ev_charge_rate, ev_id=None):
         ev_timeline_soc.append(df['SOC on Departure'].iloc[0])
 
         for (i, row) in df.iterrows():
-            dt = row['Departure DateTime'] - ev_timeline_dt[-1]
+            dt = row['datetime_on_departure'] - ev_timeline_dt[-1]
             
             time_to_max_charge = (ev_batt_capacity - ev_timeline_soc[-1]) / max_ev_charge_rate
             time_to_max_charge = pd.Timedelta(minutes=time_to_max_charge)
             time_at_max_charge = time_to_max_charge + ev_timeline_dt[-1]
 
             # Conditional logic to achieve constant charging ramp
-            full_charge_achieved_before_departure = time_at_max_charge < row['Departure DateTime']
+            full_charge_achieved_before_departure = time_at_max_charge < row['datetime_on_departure']
             if full_charge_achieved_before_departure and i != 0:
-                # Evaluate the point in time during charge that capacity is reached (i.e. before 'Departure DateTime')
+                # Evaluate the point in time during charge that capacity is reached (i.e. before 'datetime_on_departure')
                 ev_timeline_dt.append(time_at_max_charge)
                 # Ensure the 'SOC on Departure' is not exceeded during charge
                 ev_timeline_soc.append(np.min([ev_batt_capacity, row['SOC on Departure']]))
 
-            ev_timeline_dt.append(row['Departure DateTime'])
+            ev_timeline_dt.append(row['datetime_on_departure'])
             ev_timeline_soc.append(row['SOC on Departure'])
-            ev_timeline_dt.append(row['Departure DateTime'] + pd.Timedelta(seconds=1))
+            ev_timeline_dt.append(row['datetime_on_departure'] + pd.Timedelta(seconds=1))
             ev_timeline_soc.append(0)
-            ev_timeline_dt.append(row['Arrival DateTime'] - pd.Timedelta(seconds=1))
+            ev_timeline_dt.append(row['datetime_on_arrival'] - pd.Timedelta(seconds=1))
             ev_timeline_soc.append(0)
-            ev_timeline_dt.append(row['Arrival DateTime'])
+            ev_timeline_dt.append(row['datetime_on_arrival'])
             ev_timeline_soc.append(row['SOC on Arrival'])
 
-    elif dres.ev.schedule_type == "charge_event_schedule":
+    elif dres.ev.schedule_type == "charge_events":
         # Check for NaN values in critical columns
         if df[['charge_event_start', 'charge_event_end', 'charge_event_start_soc', 'charge_event_end_soc']].isna().any().any():
             print("DataFrame contains NaN values in critical columns. Please clean the data before proceeding.")
@@ -337,3 +337,56 @@ def ev_soc_timeline(dres, max_ev_charge_rate, ev_id=None):
     fig.show()
 
     return
+
+
+def plot_ev_soc(dres, asset_id):
+
+    # Set rules based on schedule type
+    schedule_type = dres.simulation_config['EV_schedule_data']['schedule_type']
+    if schedule_type == 'soc_timeline':
+        asset_id_tag = 'ev_id'
+        plot_title = 'EV SoC Timeline for EV:'
+    elif schedule_type == 'station_timeline':
+        asset_id_tag = 'station_id'
+        plot_title = 'Charging Station SoC Timeline for Station:'
+    
+    
+    # Extract relevant schedule data based on asset_id
+    df = dres.ev.schedule_data
+    df = df[df[asset_id_tag] == asset_id].copy()
+
+    # Convert datetime column to proper datetime format
+    base_date = pd.Timestamp(dres.simulation_config['EV_schedule_data']['include_date_datum'])
+    if pd.api.types.is_datetime64_any_dtype(df['datetime']):
+        df['datetime'] = pd.to_datetime(df['datetime'])
+    else:
+        df['datetime'] = base_date + pd.to_timedelta(df['datetime'], unit='s')
+
+    # Prepare data for plotting
+    df = df.sort_values('datetime').set_index('datetime')
+    x_min = df.index.min().normalize()
+    x_max = df.index.max().normalize() + pd.Timedelta(days=1)
+    full_index = pd.date_range(start=x_min, end=x_max, freq='s')
+    df = df.reindex(full_index)
+    df['soc'] = pd.to_numeric(df['soc'], errors='coerce').fillna(0)
+    df[asset_id_tag] = asset_id
+    df = df.reset_index().rename(columns={'index': 'datetime'})
+
+    # Build trace object
+    trace_soc = go.Scatter(
+        x=df['datetime'], y=df['soc'],
+        mode='lines+markers', name='SoC Over Time',
+        fill='tozeroy'
+    )
+
+    # Define layout
+    layout = go.Layout(
+        title=f"{plot_title}'{asset_id}'",
+        xaxis_title='Time',
+        yaxis_title='State of Charge (Wh)',
+        xaxis=dict(type='date', range=[x_min, x_max]),
+        yaxis=dict(range=[0, 60000])
+    )
+
+    # Plot figure (show)
+    go.Figure(data=[trace_soc], layout=layout).show()

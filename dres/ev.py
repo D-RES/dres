@@ -10,44 +10,41 @@ class EV():
         self.parent = parent
         self.schedule_data = pd.DataFrame()
         self.soc_timeline = pd.DataFrame()
-        self.schedule_type = "unknown"
+        self.schedule_type = self.parent.simulation_config['EV_schedule_data']['schedule_type'].strip().lower()
+
+        # Load data if available
+        if 'EV_schedule_data' in self.parent.simulation_config:
+            self.load_ev_data()  # Load
+
         
     
-    def load_ev_data(self, *, ev_data_file, type_of_schedule):
+    def load_ev_data(self):
         """Quick load of EV data."""
         
         t0 = performance()
 
         # Parsing options
-        schedule_type = type_of_schedule.strip().lower()
-        if schedule_type not in {"journey_events", "charge_events"}:
+        if self.schedule_type not in {"journey_events", "charge_events", "soc_timeline", "station_timeline"}:
             raise ValueError(
-                "type_of_schedule must be 'journey_events' or 'charge_events'"
+                "schedule_type must be 'journey_events', 'charge_events', 'soc_timeline' or 'station_timeline"
             )
-        spaghetti_model = schedule_type == "journey_events"
-
+        
         # Full path to file
-        full_filename = os.path.join(self.parent.paths.inputs, ev_data_file)
+        full_filename = os.path.join(
+            self.parent.paths.inputs, 
+            self.parent.simulation_config['EV_schedule_data']['filename']
+        )
 
         # Open csv
         df = pd.read_csv(full_filename)
 
-        # Create column with complete DateTime obj for Arrival and Departure
-        if spaghetti_model:
-            # Spaghetti model
-            df['Departure DateTime'] = [pd.to_datetime(f"2018-12-31 {row['Departure Time']}") + pd.Timedelta(days=row.Day-1) for (i,row) in df.iterrows()]
-            df['Arrival DateTime'] = [pd.to_datetime(f"2018-12-31 {row['Arrival Time']}") + pd.Timedelta(days=row.Day-1) for (i,row) in df.iterrows()]
+        # Map columns to standard names
+        column_mapping = self.parent.simulation_config['EV_schedule_data']['column_name_mappings']
+        column_mapping = {v: k for k, v in column_mapping.items()} # Reverse the mapping
+        df = df[[col for col in df.columns if col in column_mapping.keys()]].copy()
+        df.rename(columns=column_mapping, inplace=True)
 
-            df.drop(columns=['Day', 'Departure Time', 'Arrival Time', 'Departure Full Time', 'Arrival Full Time', 'Distance (km)', 'SOC_cost'], inplace=True)
-
-            rename_map = {
-                "vehicle": "ev_id",
-            }
-
-            df = df.rename(columns=rename_map)
-            self.schedule_type = "journey_events"
-
-        else:
+        if self.schedule_type == "charge_events":
             # Data
             # Evaluate DateTime and Duration columns
             df['ChargeEventStartDate'] = pd.to_datetime(df['ChargeEventStartDate'], format='%d/%m/%Y %I:%M:%S %p')
@@ -69,7 +66,19 @@ class EV():
             """
             self.schedule_type = "charge_event_schedule"
 
-        
+        elif self.schedule_type == "soc_timeline":
+            None
+
+        if 'include_date_datum' in self.parent.simulation_config['EV_schedule_data']:
+            if "datetime" in df.columns:
+                base_date = pd.Timestamp(self.parent.simulation_config['EV_schedule_data']['include_date_datum'])
+    
+                df["datetime"] = pd.to_datetime(
+                    df["datetime"],
+                    unit="s",
+                    origin=base_date
+                )
+                
         self.schedule_data = df
         performance(t0)
         return
@@ -86,4 +95,23 @@ class EV():
             'entries': most_common.values
         }).reset_index(drop=True)
         
+        return df_result
+
+    def list_most_common_vehicle_ids(self, top_n=20, id_column="ev_id"):
+        """Return DataFrame of most common vehicle IDs in schedule data."""
+        if self.schedule_data.empty:
+            raise ValueError("No EV schedule data loaded. Please load data first.")
+
+        if id_column not in self.schedule_data.columns:
+            raise KeyError(
+                f"Column '{id_column}' not found in schedule_data. "
+                f"Available columns: {list(self.schedule_data.columns)}"
+            )
+
+        most_common = self.schedule_data[id_column].value_counts().head(top_n)
+        df_result = pd.DataFrame({
+            id_column: most_common.index,
+            "entries": most_common.values
+        }).reset_index(drop=True)
+
         return df_result

@@ -10,7 +10,7 @@ various runtime paramters specific to a that run. Multiple `dres_sim` objects ca
 be created as part of any generic workflow, to compare results from different 
 runs (within the same Python session). 
 
-When calling the constructor (e.g. `sim = DRES_Sim()`), the user should specify the
+When calling the constructor (e.g. `sim = DRES_Sim("run_001")`), the user should specify the
 following parameters:
     - ev_model
     - start_date
@@ -148,11 +148,22 @@ class Params():
 class DRES_Sim():
     # Gather simulation parameters from system environment variables
     
-    def __init__(self):
+    def __init__(self, simulation_name):
+
+        if not simulation_name:
+            raise ValueError("Please state e.g. 'simulation-1', 'simulation-xyz', etc. when creating a DRES_Sim object.")
+        self.simulation_name = simulation_name
 
         # Initialise `dres` object with data_root location
         self.verbose = False
         self.paths = Paths(verbose=self.verbose)
+        
+        # Load simulation configuration
+        self.simulation_config = nemo.load_yaml(dir=self.paths.inputs, filename=f"{self.simulation_name}.yaml")
+        # Gather assets
+        self.assets = nemo.load_yaml(dir=self.paths.inputs, filename="assets")
+
+        # Create data containers
         self.ev = EV(self)
         self.plots = Plots(self)
         self.params = Params()
@@ -160,8 +171,7 @@ class DRES_Sim():
         # Set code performance start time
         self.t0 = performance(always_verbose=True)
 
-        # Gather assets
-        self.assets = nemo.load_yaml(dir=self.paths.inputs, filename="assets")
+
         
 
     # Main run sequence

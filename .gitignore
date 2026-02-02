@@ -176,3 +176,4 @@ cython_debug/
 *.cache.sqlite
 *temp__*
 .DS_Store
+*.ipynb
