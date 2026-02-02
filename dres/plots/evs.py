@@ -350,41 +350,62 @@ def plot_ev_soc(dres, asset_id):
         asset_id_tag = 'station_id'
         plot_title = 'Charging Station SoC Timeline for Station:'
     
+    # Get base date for datetime conversion
+    base_date = pd.Timestamp(dres.simulation_config['EV_schedule_data']['include_date_datum'])
     
     # Extract relevant schedule data based on asset_id
     df = dres.ev.schedule_data
     df = df[df[asset_id_tag] == asset_id].copy()
 
-    # Convert datetime column to proper datetime format
-    base_date = pd.Timestamp(dres.simulation_config['EV_schedule_data']['include_date_datum'])
-    if pd.api.types.is_datetime64_any_dtype(df['datetime']):
-        df['datetime'] = pd.to_datetime(df['datetime'])
-    else:
-        df['datetime'] = base_date + pd.to_timedelta(df['datetime'], unit='s')
+    # Check if dataframe is empty
+    try:
+        
+    
+        # Convert datetime column to proper datetime format
+        if pd.api.types.is_datetime64_any_dtype(df['datetime']):
+            df['datetime'] = pd.to_datetime(df['datetime'])
+        else:
+            df['datetime'] = base_date + pd.to_timedelta(df['datetime'], unit='s')
 
-    # Prepare data for plotting
-    df = df.sort_values('datetime').set_index('datetime')
-    x_min = df.index.min().normalize()
-    x_max = df.index.max().normalize() + pd.Timedelta(days=1)
-    full_index = pd.date_range(start=x_min, end=x_max, freq='s')
-    df = df.reindex(full_index)
-    df['soc'] = pd.to_numeric(df['soc'], errors='coerce').fillna(0)
-    df[asset_id_tag] = asset_id
-    df = df.reset_index().rename(columns={'index': 'datetime'})
+        # Prepare data for plotting
+        df = df.sort_values('datetime').set_index('datetime')
+        x_min = df.index.min().normalize()
+        x_max = df.index.max().normalize() + pd.Timedelta(days=1)
+        full_index = pd.date_range(start=x_min, end=x_max, freq='s')
+        df = df.reindex(full_index)
+        df['soc'] = pd.to_numeric(df['soc'], errors='coerce').fillna(0)
+        df[asset_id_tag] = asset_id
+        df = df.reset_index().rename(columns={'index': 'datetime'})
 
-    # Build trace object
-    trace_soc = go.Scatter(
-        x=df['datetime'], y=df['soc'],
-        mode='lines+markers', name='SoC Over Time',
-        fill='tozeroy'
-    )
+        # Build trace object
+        trace_soc = go.Scatter(
+            x=df['datetime'], y=df['soc'],
+            mode='lines+markers', name='SoC Over Time',
+            fill='tozeroy'
+        )
+
+        datetime_range = [x_min, x_max]
+
+    except Exception as e:
+        print(f"No data available for {asset_id_tag} '{asset_id}'. Error: {e}")
+        
+        # Build dummy trace object
+        trace_soc = go.Scatter(
+            x=[], y=[],
+            mode='lines+markers', name='SoC Over Time',
+            fill='tozeroy'
+        )
+
+        datetime_range = [pd.Timestamp(base_date), pd.Timestamp(base_date + pd.Timedelta(days=1))]
+    
+            
 
     # Define layout
     layout = go.Layout(
         title=f"{plot_title}'{asset_id}'",
         xaxis_title='Time',
         yaxis_title='State of Charge (Wh)',
-        xaxis=dict(type='date', range=[x_min, x_max]),
+        xaxis=dict(type='date', range=datetime_range),
         yaxis=dict(range=[0, 60000])
     )
 

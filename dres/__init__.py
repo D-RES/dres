@@ -6,4 +6,4 @@ from dres.DRES_Sim import DRES_Sim as go        # Main DRES class for initialisa
 from dres.DRES_Sim import DRES_Sim      # Main DRES Simulation class
 
 
-__version__ = "0.3.3"
+__version__ = "0.3.3.1"
