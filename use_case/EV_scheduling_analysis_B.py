@@ -24,13 +24,13 @@ sim_ev.ev.list_most_common_ev_entries().head(20)
 # ### Plot SoC timeline for a single EV 
 
 # %%
-sim_ev.plots.ev.plot_ev_soc('morning119')
+sim_ev.plots.ev.soc_timeline('morning119')
 
 # %% [markdown]
 # ### Plot SoC timeline for a single charging station
 
 # %%
-sim_chrg.plots.ev.plot_ev_soc('cs_5')
+sim_chrg.plots.ev.soc_timeline('cs_5')
 
 # %%
 

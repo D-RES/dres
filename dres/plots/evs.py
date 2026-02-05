@@ -339,7 +339,10 @@ def ev_soc_timeline(dres, max_ev_charge_rate, ev_id=None):
     return
 
 
-def plot_ev_soc(dres, asset_id):
+def soc_timeline(dres, asset_id):
+
+    # Template for annotations
+    annotations = []
 
     # Set rules based on schedule type
     schedule_type = dres.simulation_config['EV_schedule_data']['schedule_type']
@@ -386,6 +389,30 @@ def plot_ev_soc(dres, asset_id):
 
         datetime_range = [x_min, x_max]
 
+
+        # Evaluate annotations for charging sessions (if station timeline)
+        if schedule_type == 'station_timeline':
+            charge_starts = ((df["soc"].shift(1) == 0) & (df["soc"] > 0)).to_numpy().nonzero()[0]
+            charge_ends = ((df["soc"].shift(1) > 0) & (df["soc"] == 0)).to_numpy().nonzero()[0]
+            charge_midpoints = np.floor((charge_starts + charge_ends) / 2)
+            annot_plot_context = zip(
+                df['datetime'][charge_midpoints].to_list(), 
+                df['ev_id'][charge_midpoints].to_list()
+            )
+            annotations = [
+                dict(
+                    x=t,
+                    y=0.975,
+                    yref='paper',
+                    text=str(ev_id),
+                    showarrow=False,
+                    font=dict(size=10, color='#333')
+                )
+                for t, ev_id in annot_plot_context
+            ]
+        
+        
+
     except Exception as e:
         print(f"No data available for {asset_id_tag} '{asset_id}'. Error: {e}")
         
@@ -398,15 +425,14 @@ def plot_ev_soc(dres, asset_id):
 
         datetime_range = [pd.Timestamp(base_date), pd.Timestamp(base_date + pd.Timedelta(days=1))]
     
-            
-
     # Define layout
     layout = go.Layout(
         title=f"{plot_title}'{asset_id}'",
         xaxis_title='Time',
         yaxis_title='State of Charge (Wh)',
         xaxis=dict(type='date', range=datetime_range),
-        yaxis=dict(range=[0, 60000])
+        yaxis=dict(range=[0, 60000]),
+        annotations=annotations,
     )
 
     # Plot figure (show)

@@ -35,7 +35,8 @@ def performance(t0=None, msg="", always_verbose=False, verbose=False):
     if verbose or always_verbose:
         if t0 is None:
             t0 = time.perf_counter()
-            print("Runtime performance:")
+            if verbose is None:
+                print("Runtime performance:")
             return t0
         else:
             t1 = time.perf_counter()
