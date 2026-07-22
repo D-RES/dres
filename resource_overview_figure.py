@@ -209,16 +209,18 @@ def main():
     print(f"Tidal: mean p.u. = {tidal_pu.mean():.3f}")
     print(f"Demand: {demand_mw.sum():,.1f} MWh/year | mean = {demand_gw.mean():.3f} GW")
 
-    # ── 4-panel resource overview figure ──────────────────────────────────────
+    # ── 2x2 resource overview figure -- ORIGINAL first-version style, only the ─
+    #    subplot arrangement changed from 4x1 (vertical stack) to 2x2. Titles,
+    #    labels, colours, fill_between visual style, demand in GW, and the
+    #    output filename are all otherwise UNCHANGED from the first version.
     try:
-        fig, axes = plt.subplots(4, 1, figsize=(12, 9), sharex=True,
-                                  gridspec_kw={"hspace": 0.45})
+        fig, axes = plt.subplots(2, 2, figsize=(12, 9))
 
         panels = [
-            (axes[0], wave_pu, C_WAVE, "Wave (pu)", "Wave Resource — Billia Croo (CorPower 2019)", (0, 1.05)),
-            (axes[1], tidal_pu, C_TIDAL, "Tidal (pu)", "Tidal Resource — Westray-South (2019)", (0, 1.05)),
-            (axes[2], wind_pu, C_WIND, "Wind (pu)", "Combined Wind — All Orkney Farms", (0, 1.05)),
-            (axes[3], demand_gw, C_DEMAND, "Demand (GW)", "Orkney Total Demand", None),
+            (axes[0, 0], wave_pu,   C_WAVE,   "Wave (pu)",   "Wave Resource — Billia Croo (CorPower 2019)", (0, 1.05)),
+            (axes[0, 1], tidal_pu,  C_TIDAL,  "Tidal (pu)",  "Tidal Resource — Westray-South (2019)",        (0, 1.05)),
+            (axes[1, 0], wind_pu,   C_WIND,   "Wind (pu)",   "Combined Wind — All Orkney Farms",            (0, 1.05)),
+            (axes[1, 1], demand_gw, C_DEMAND, "Demand (GW)", "Orkney Total Demand",                          None),
         ]
         for ax, series, col, ylabel, title, ylim in panels:
             ax.fill_between(IDX, series.values, alpha=0.60, color=col)
@@ -227,12 +229,14 @@ def main():
             ax.set_title(title, fontsize=13, pad=3)
             if ylim:
                 ax.set_ylim(*ylim)
+            ax.xaxis.set_major_locator(mdates.MonthLocator())
+            ax.xaxis.set_major_formatter(mdates.DateFormatter("%b"))
 
-        axes[3].xaxis.set_major_locator(mdates.MonthLocator())
-        axes[3].xaxis.set_major_formatter(mdates.DateFormatter("%b"))
-        axes[3].set_xlabel("2019", fontsize=14)
+        axes[1, 0].set_xlabel("2019", fontsize=14)
+        axes[1, 1].set_xlabel("2019", fontsize=14)
 
         fig.suptitle("Orkney 2019 — Energy Resource Overview", fontsize=16, fontweight="bold")
+        fig.tight_layout(rect=[0, 0, 1, 0.96])
 
         path = os.path.join(OUTPUT_DIR, "Figure1_Resource_Overview.png")
         fig.savefig(path, dpi=300, bbox_inches="tight")

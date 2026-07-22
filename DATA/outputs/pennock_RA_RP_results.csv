@@ -1,0 +1,4 @@
+Resource,Capacity Factor,RA(0.2),"RP(0.2,3)"
+Wind,0.462,0.679,0.634
+Wave,0.413,0.631,0.615
+Tidal,0.393,0.584,0.276

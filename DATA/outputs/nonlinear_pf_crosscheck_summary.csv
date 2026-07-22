@@ -1,0 +1,16 @@
+scenario,pf_convergence_voltage_pass,slack_adjustment_review_needed,hours_checked,hours_within_slack_tolerance
+R01,True,True,5,2
+R02,True,True,5,2
+R06,True,True,5,2
+R03,True,True,5,2
+R04,True,True,5,2
+R07,True,True,5,2
+R08,True,True,5,2
+R09,True,True,5,1
+R10,True,True,5,2
+R11,True,True,5,1
+R12,False,True,5,2
+R13,False,True,5,2
+R14,True,True,5,2
+R15,True,True,5,2
+R16,True,True,5,1

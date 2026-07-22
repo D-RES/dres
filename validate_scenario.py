@@ -368,8 +368,16 @@ def validate_scenario(network, baseline_network, scenario, tolerance_mw=1e-4):
     _p(f"Non-interconnector line s_nom unchanged from baseline: {lines_match}", lines_match)
     ok &= lines_match
 
-    interconnector_ok = (network.lines.loc[INTERCONNECTOR_LINES, "s_nom"] == INTERCONNECTOR_S_NOM).all()
-    _p(f"Interconnector s_nom == {INTERCONNECTOR_S_NOM} MVA on all 4 segments: {interconnector_ok}", interconnector_ok)
+    # Interconnector rating: use the scenario-declared expected value if
+    # provided (e.g. a deliberately tightened "isolated grid" scenario),
+    # otherwise fall back to the standard project-wide default. This avoids
+    # incorrectly flagging an INTENTIONAL constraint change as a validation
+    # failure, while still catching a genuinely unintended/wrong value.
+    expected_interconnector_s_nom = scenario.get("expected_interconnector_s_nom", INTERCONNECTOR_S_NOM)
+    interconnector_ok = (network.lines.loc[INTERCONNECTOR_LINES, "s_nom"] == expected_interconnector_s_nom).all()
+    _p(f"Interconnector s_nom == {expected_interconnector_s_nom} MVA on all 4 segments "
+       f"(expected {'from scenario metadata' if 'expected_interconnector_s_nom' in scenario else 'project default'}): "
+       f"{interconnector_ok}", interconnector_ok)
     ok &= interconnector_ok
 
     control_match = network.generators["control"].equals(baseline_network.generators["control"])
@@ -379,11 +387,25 @@ def validate_scenario(network, baseline_network, scenario, tolerance_mw=1e-4):
     if not carrier_match:
         unexplained_diffs.append("Generator carrier assignments differ from baseline")
 
+    # p_nom check: a scenario may explicitly declare intentional capacity
+    # changes (e.g. capping the gas turbine for an "isolated grid" study).
+    # Only generators NOT declared as intentionally changed are required to
+    # match baseline exactly -- anything declared gets checked against its
+    # OWN declared expected value instead, so an intentional change is
+    # confirmed correct rather than silently ignored OR wrongly flagged.
+    allowed_pnom_changes = scenario.get("allowed_pnom_changes", {})
     for gen in wind_gens + [TIDAL_GEN, "gas_turbine(Oil_station)", "Slack_generator"]:
         actual = network.generators.loc[gen, "p_nom"]
-        expected = baseline_network.generators.loc[gen, "p_nom"]
-        if not np.isclose(actual, expected):
-            unexplained_diffs.append(f"{gen} p_nom: {actual} != baseline {expected}")
+        if gen in allowed_pnom_changes:
+            expected = allowed_pnom_changes[gen]
+            if not np.isclose(actual, expected):
+                unexplained_diffs.append(
+                    f"{gen} p_nom: {actual} != expected {expected} (per scenario['allowed_pnom_changes'])"
+                )
+        else:
+            expected = baseline_network.generators.loc[gen, "p_nom"]
+            if not np.isclose(actual, expected):
+                unexplained_diffs.append(f"{gen} p_nom: {actual} != baseline {expected}")
 
     if unexplained_diffs:
         ok = False
@@ -991,7 +1013,7 @@ def cross_scenario_checks(nc_file_paths, scenarios=None):
               "pairwise monotonicity check.)")
 
 
-def validate_critical_hours_pf(nc_file_path):
+def validate_critical_hours_pf(nc_file_path, export_bus_voltages_dir=None):
     """
     Re-runs genuine nonlinear pf() at the hours of: peak demand, highest
     line loading, highest battery charge, highest battery discharge, and
@@ -1002,10 +1024,21 @@ def validate_critical_hours_pf(nc_file_path):
     Returns a dict: {"pass": bool, "hour_results": {label: bool, ...}}
     `pass` is True only if EVERY critical hour converged, stayed within
     voltage bounds, and had no line/transformer exceeding 100% loading.
+
+    If export_bus_voltages_dir is provided, also saves a CSV with the FULL
+    per-bus voltage magnitude (p.u.) at every critical hour -- not just the
+    min/max summary used for the pass/fail check -- to
+    {export_bus_voltages_dir}/{scenario_id}_bus_voltages.csv, with columns:
+    scenario_id, hour_label, snapshot, bus, voltage_pu, within_bounds.
+    This is purely additive: when export_bus_voltages_dir is None (the
+    default), behaviour is UNCHANGED from before this parameter existed.
     """
     print("\n" + "=" * 100)
     print(f"CRITICAL-HOUR NONLINEAR pf() VALIDATION: {nc_file_path}")
     print("=" * 100)
+
+    scenario_id = os.path.splitext(os.path.basename(nc_file_path))[0]
+    bus_voltage_rows = [] if export_bus_voltages_dir is not None else None
 
     network = pypsa.Network()
     network.import_from_netcdf(nc_file_path)
@@ -1162,6 +1195,20 @@ def validate_critical_hours_pf(nc_file_path):
             v_ok = (v_min >= 0.90) and (v_max <= 1.10)
             _p(f"Voltages within [0.90, 1.10] p.u.: {v_ok} (min={v_min:.4f}, max={v_max:.4f})", v_ok)
             hour_ok &= v_ok
+
+            # Optional: capture the FULL per-bus voltage detail (not just
+            # min/max) for later export -- additive, does not change any
+            # pass/fail logic or existing behaviour.
+            if bus_voltage_rows is not None:
+                for bus_name, voltage_pu in v.items():
+                    bus_voltage_rows.append({
+                        "scenario_id": scenario_id,
+                        "hour_label": label,
+                        "snapshot": hour,
+                        "bus": bus_name,
+                        "voltage_pu": float(voltage_pu),
+                        "within_bounds": bool(0.90 <= voltage_pu <= 1.10),
+                    })
 
             p0 = single.lines_t.p0.loc[hour]
             q0 = (single.lines_t.q0.loc[hour] if "q0" in single.lines_t.keys() and not single.lines_t.q0.empty
@@ -1382,11 +1429,24 @@ def validate_critical_hours_pf(nc_file_path):
           f"({sum(hour_slack_adjustment_ok.values())}/{len(hour_slack_adjustment_ok)} hours within tolerance)")
     print("-" * 100)
 
+    bus_voltage_csv_path = None
+    if bus_voltage_rows is not None:
+        os.makedirs(export_bus_voltages_dir, exist_ok=True)
+        bus_voltage_csv_path = f"{export_bus_voltages_dir}/{scenario_id}_bus_voltages.csv"
+        pd.DataFrame(bus_voltage_rows).to_csv(bus_voltage_csv_path, index=False)
+        n_buses = pd.DataFrame(bus_voltage_rows)["bus"].nunique()
+        n_out_of_bounds = int((~pd.DataFrame(bus_voltage_rows)["within_bounds"]).sum())
+        print(f"Saved full per-bus voltage detail ({n_buses} buses x {len(hour_to_labels)} hours): "
+              f"{bus_voltage_csv_path}")
+        if n_out_of_bounds > 0:
+            print(f"  *** {n_out_of_bounds} bus-hour combination(s) outside [0.90, 1.10] p.u. -- see CSV. ***")
+
     return {
         "pass": overall_pf_pass,
         "hour_results": hour_results,
         "slack_adjustment_review_needed": slack_adjustment_review_needed,
         "hour_slack_adjustment_ok": hour_slack_adjustment_ok,
+        "bus_voltage_csv_path": bus_voltage_csv_path,
     }
 
 
