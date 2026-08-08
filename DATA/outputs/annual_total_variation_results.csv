@@ -1,0 +1,5 @@
+resource_combination,total_variation_complementarity
+Wind-Wave,0.12572700506586532
+Wind-Tidal,0.12358608626326006
+Wave-Tidal,0.0546268235426256
+Wind-Wave-Tidal,0.16344806298962888

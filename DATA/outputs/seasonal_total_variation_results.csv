@@ -1,0 +1,17 @@
+season,resource_combination,total_variation_complementarity
+Winter,Wind-Wave,0.13627585272085196
+Winter,Wind-Tidal,0.12850824049661635
+Winter,Wave-Tidal,0.07149054194652837
+Winter,Wind-Wave-Tidal,0.1783881909154964
+Spring,Wind-Wave,0.1238054951429366
+Spring,Wind-Tidal,0.11762981064948386
+Spring,Wave-Tidal,0.05045710854130614
+Spring,Wind-Wave-Tidal,0.15479689601584956
+Summer,Wind-Wave,0.11239180659947445
+Summer,Wind-Tidal,0.13271110648393347
+Summer,Wave-Tidal,0.034592328660519756
+Summer,Wind-Wave-Tidal,0.15841710970949607
+Autumn,Wind-Wave,0.1289479223971991
+Autumn,Wind-Tidal,0.11349066504783423
+Autumn,Wave-Tidal,0.06163395216720913
+Autumn,Wind-Wave-Tidal,0.16052249692849974
