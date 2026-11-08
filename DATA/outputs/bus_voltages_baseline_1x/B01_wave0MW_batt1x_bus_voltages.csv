@@ -1,0 +1,366 @@
+scenario_id,hour_label,snapshot,bus,voltage_pu,within_bounds
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,THSO3-,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,THU-3L5,1.0000673258301886,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,THU-6L5,1.0000651057006056,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,SCORRA3A,1.00283177200162,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,STROMN3A,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,STROMN1A,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,STROMN3B,1.00000609279293,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,STROMN1B,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,STROMN3C,0.9973541017777,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,BURGAR3A,0.9999925803759104,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,BURGAR3B,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,BURGAR1A,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,ROUSAY3A,1.0002526496996202,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,ROUSAY3B,1.0002492538067904,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,ROUSAY1A,0.9887744049966496,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,WESTRY3A,1.0023610611714184,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,WESTRY1A,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,EDAY3A,1.004032574090956,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,EDAY1A,0.9992439807032443,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,SANDAY3A,1.0001985020694877,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,SANDAY1A,0.9909339877049461,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,STRONS3A,0.999187451081562,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,STRONS1A,0.9950841184407355,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,SHAPIN3A,0.9978567981483663,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,SHAPIN1A,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,KIRKWA3A,0.9941422883569995,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,KIRKWA1A,0.9999263179342337,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,KIRKWA1B,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,STMARY3A,0.9950178676942548,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,STMARY1A,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,NTHHOY3A,1.0026425402849795,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,NTHHOY3B,1.0026305931848412,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,NTHHOY1A,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,LYNESS3A,0.9997141506718724,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,LYNESS3B,0.999715032688268,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,LYNESS1A,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,FLOTTA3A,0.9994370723294285,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,FLOTTA3B,0.9994374868480501,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,FLOTTA1A,0.9995917168996292,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,NORTHF1A,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,FLTOCC3B,0.9993500146410162,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,SCORRA3B,0.9997252011490829,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,EDAY3B,1.0023464577933074,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,FLTOCC1C,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,KIRKWA1C,0.9999584277405925,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,SANDAY3B,1.0001985020694877,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,STRONS3B,0.999187451081562,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,KIRKWA3B,0.9946086396154431,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,THORNF1B,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,THORNFG1,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,THORNFG2,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,THORNF1A,1.0000824641093278,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,SIGURD1A,0.9999933337101486,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,SIGURDG1,0.9997512885915071,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,STRONS3C,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,SPURNE3-,1.0001808757887154,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,SPURNE3A,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,METC1,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,FLOTTA1B,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,NWP3-,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,HAMMARS3A,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,SCORRA3C,0.9991675047739986,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,NEWBIG3A,1.0064348686206543,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,NEWBIG1A,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,NEWBIG1B,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,NEWBIG1C,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,NEWBIG1D,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,BARNS3WA,0.9956203820306054,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,BARNS3WB,1.0,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,EDAY3C,1.0023646443460594,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,STHHOY3A,1.0067325008669887,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,STHHOY3B,0.9993013387637921,True
+B01_wave0MW_batt1x,Peak demand,2019-01-23 17:00:00,NEWHOL3A,0.9976006405491548,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,THSO3-,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,THU-3L5,1.0000782721105277,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,THU-6L5,1.000078560330981,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,SCORRA3A,1.0028251374855548,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,STROMN3A,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,STROMN1A,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,STROMN3B,1.0000272770787242,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,STROMN1B,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,STROMN3C,0.9958993578808991,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,BURGAR3A,0.9999881126106148,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,BURGAR3B,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,BURGAR1A,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,ROUSAY3A,0.9990999817611296,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,ROUSAY3B,0.9990965954156673,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,ROUSAY1A,0.9876532779408498,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,WESTRY3A,1.0000071179975845,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,WESTRY1A,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,EDAY3A,1.0008239231317217,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,EDAY1A,0.9973657396193835,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,SANDAY3A,0.9999221442925708,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,SANDAY1A,0.9906913697862596,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,STRONS3A,1.0004412919400416,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,STRONS1A,0.9963579779420413,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,SHAPIN3A,0.9970164847224909,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,SHAPIN1A,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,KIRKWA3A,0.9946175749139967,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,KIRKWA1A,0.9999292589508082,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,KIRKWA1B,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,STMARY3A,0.9953600292981822,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,STMARY1A,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,NTHHOY3A,1.0026031933743431,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,NTHHOY3B,1.00259084188156,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,NTHHOY1A,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,LYNESS3A,0.999619185015947,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,LYNESS3B,0.9996200927902811,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,LYNESS1A,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,FLOTTA3A,0.9992912091042204,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,FLOTTA3B,0.999290605701517,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,FLOTTA1A,0.9998150442922616,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,NORTHF1A,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,FLTOCC3B,0.9992107338869706,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,SCORRA3B,0.9935420749569298,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,EDAY3B,1.0004718052994013,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,FLTOCC1C,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,KIRKWA1C,0.999959916458075,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,SANDAY3B,0.9999221442925708,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,STRONS3B,1.0004412919400416,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,KIRKWA3B,0.99513846781306,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,THORNF1B,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,THORNFG1,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,THORNFG2,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,THORNF1A,1.0000154596608768,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,SIGURD1A,0.9999933337101485,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,SIGURDG1,0.9997512885915071,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,STRONS3C,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,SPURNE3-,1.0000211320970362,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,SPURNE3A,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,METC1,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,FLOTTA1B,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,NWP3-,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,HAMMARS3A,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,SCORRA3C,0.9937371505597358,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,NEWBIG3A,1.001195212770616,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,NEWBIG1A,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,NEWBIG1B,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,NEWBIG1C,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,NEWBIG1D,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,BARNS3WA,0.9960300657324753,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,BARNS3WB,1.0,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,EDAY3C,1.0004802689973373,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,STHHOY3A,1.0026950240189054,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,STHHOY3B,0.9919783116225174,True
+B01_wave0MW_batt1x,Highest line loading,2019-01-30 18:00:00,NEWHOL3A,0.997894500751845,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,THSO3-,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,THU-3L5,1.0000438948830153,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,THU-6L5,1.0000385457696812,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,SCORRA3A,0.9965456967280526,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,STROMN3A,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,STROMN1A,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,STROMN3B,0.9999460301401473,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,STROMN1B,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,STROMN3C,0.9970793782674748,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,BURGAR3A,0.9999633285739024,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,BURGAR3B,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,BURGAR1A,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,ROUSAY3A,0.99877642916522,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,ROUSAY3B,0.9987731917097284,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,ROUSAY1A,0.9878153923248457,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,WESTRY3A,1.000311347158514,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,WESTRY1A,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,EDAY3A,1.0010683478252982,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,EDAY1A,0.9975662007125325,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,SANDAY3A,1.0000411658612955,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,SANDAY1A,0.9912020415173136,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,STRONS3A,0.9948931599083433,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,STRONS1A,0.9909531322739452,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,SHAPIN3A,0.9952893855063061,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,SHAPIN1A,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,KIRKWA3A,0.9880913500698542,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,KIRKWA1A,0.9998893125566954,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,KIRKWA1B,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,STMARY3A,0.9910561847367761,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,STMARY1A,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,NTHHOY3A,0.9926201160293798,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,NTHHOY3B,0.992611173904971,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,NTHHOY1A,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,LYNESS3A,0.982393256051823,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,LYNESS3B,0.9823985152176986,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,LYNESS1A,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,FLOTTA3A,0.9764098215325452,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,FLOTTA3B,0.9764207411651712,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,FLOTTA1A,0.9989473213195313,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,NORTHF1A,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,FLTOCC3B,0.9758395339257707,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,SCORRA3B,1.0014378094195326,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,EDAY3B,1.000502839532331,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,FLTOCC1C,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,KIRKWA1C,0.9999401384791549,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,SANDAY3B,1.0000411658612955,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,STRONS3B,0.9948931599083433,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,KIRKWA3B,0.9886056346825549,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,THORNF1B,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,THORNFG1,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,THORNFG2,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,THORNF1A,1.0006821888844368,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,SIGURD1A,0.9999933337101486,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,SIGURDG1,0.999751288591507,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,STRONS3C,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,SPURNE3-,0.9998134073334802,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,SPURNE3A,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,METC1,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,FLOTTA1B,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,NWP3-,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,HAMMARS3A,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,SCORRA3C,0.9998247411484221,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,NEWBIG3A,1.0010595971235972,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,NEWBIG1A,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,NEWBIG1B,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,NEWBIG1C,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,NEWBIG1D,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,BARNS3WA,0.9910814963327959,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,BARNS3WB,1.0,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,EDAY3C,1.000558570038302,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,STHHOY3A,1.006799916770671,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,STHHOY3B,1.0033644530912487,True
+B01_wave0MW_batt1x,Highest renewable output,2019-01-14 17:00:00,NEWHOL3A,0.9944225113406577,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,THSO3-,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,THU-3L5,1.0000412353541546,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,THU-6L5,1.0000352694504298,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,SCORRA3A,0.9990668564929525,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,STROMN3A,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,STROMN1A,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,STROMN3B,0.9999727869822259,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,STROMN1B,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,STROMN3C,0.9986424446806454,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,BURGAR3A,0.9999805803479929,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,BURGAR3B,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,BURGAR1A,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,ROUSAY3A,1.0007721320679177,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,ROUSAY3B,1.000770402788154,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,ROUSAY1A,0.9949227793924267,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,WESTRY3A,1.0012167044441673,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,WESTRY1A,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,EDAY3A,1.0010845224022713,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,EDAY1A,0.9989575214548874,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,SANDAY3A,1.0002299529440541,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,SANDAY1A,0.9954798755029535,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,STRONS3A,0.9988004051654478,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,STRONS1A,0.9966105228010105,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,SHAPIN3A,0.9977508642405669,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,SHAPIN1A,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,KIRKWA3A,0.9934168296267107,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,KIRKWA1A,0.9999369947554332,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,KIRKWA1B,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,STMARY3A,0.9956522983187278,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,STMARY1A,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,NTHHOY3A,0.9968515148575536,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,NTHHOY3B,0.9968415545997357,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,NTHHOY1A,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,LYNESS3A,0.9900753145492217,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,LYNESS3B,0.9900782636537435,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,LYNESS1A,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,FLOTTA3A,0.9860640131393598,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,FLOTTA3B,0.9860704805447706,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,FLOTTA1A,0.9993757051629645,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,NORTHF1A,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,FLTOCC3B,0.9856582132432771,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,SCORRA3B,1.0042645506226473,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,EDAY3B,1.0006774331110453,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,FLTOCC1C,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,KIRKWA1C,0.9999660732405637,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,SANDAY3B,1.0002299529440541,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,STRONS3B,0.9988004051654478,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,KIRKWA3B,0.9937100119270086,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,THORNF1B,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,THORNFG1,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,THORNFG2,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,THORNF1A,1.000774277811815,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,SIGURD1A,0.9999933337101485,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,SIGURDG1,0.999751288591507,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,STRONS3C,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,SPURNE3-,1.000102765804143,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,SPURNE3A,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,METC1,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,FLOTTA1B,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,NWP3-,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,HAMMARS3A,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,SCORRA3C,1.00263024495651,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,NEWBIG3A,1.0015675257316174,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,NEWBIG1A,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,NEWBIG1B,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,NEWBIG1C,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,NEWBIG1D,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,BARNS3WA,0.9958969061254804,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,BARNS3WB,1.0,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,EDAY3C,1.000654401687127,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,STHHOY3A,1.0084058489677434,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,STHHOY3B,1.005837077469122,True
+B01_wave0MW_batt1x,Highest battery charging,2019-01-01 00:00:00,NEWHOL3A,0.9978127644375271,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,THSO3-,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,THU-3L5,1.0000575679251253,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,THU-6L5,1.000053497430186,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,SCORRA3A,1.003889631176755,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,STROMN3A,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,STROMN1A,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,STROMN3B,1.0000039149079465,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,STROMN1B,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,STROMN3C,0.9990315150917256,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,BURGAR3A,0.9999991038355016,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,BURGAR3B,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,BURGAR1A,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,ROUSAY3A,1.0003759381469446,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,ROUSAY3B,1.0003731337148123,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,ROUSAY1A,0.9908446415484417,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,WESTRY3A,1.0019138869099395,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,WESTRY1A,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,EDAY3A,1.0029607216465897,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,EDAY1A,0.9991143873992528,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,SANDAY3A,1.0001352068789866,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,SANDAY1A,0.9924264036286997,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,STRONS3A,0.9996769172717928,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,STRONS1A,0.9962296688302695,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,SHAPIN3A,0.9999386030755457,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,SHAPIN1A,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,KIRKWA3A,0.9978927793749174,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,KIRKWA1A,0.9999570930121827,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,KIRKWA1B,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,STMARY3A,0.9973770185348196,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,STMARY1A,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,NTHHOY3A,1.0040573448819157,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,NTHHOY3B,1.004041650072182,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,NTHHOY1A,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,LYNESS3A,1.0018325809385433,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,LYNESS3B,1.0018328326983097,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,LYNESS1A,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,FLOTTA3A,1.002169219118705,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,FLOTTA3B,1.0021674259299826,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,FLOTTA1A,0.9999204275646774,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,NORTHF1A,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,FLTOCC3B,1.0021457976189736,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,SCORRA3B,1.0043488497226787,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,EDAY3B,1.0017309746785095,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,FLTOCC1C,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,KIRKWA1C,0.9999745990262774,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,SANDAY3B,1.0001352068789866,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,STRONS3B,0.9996769172717928,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,KIRKWA3B,0.9980943285085963,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,THORNF1B,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,THORNFG1,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,THORNFG2,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,THORNF1A,1.0000476328508467,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,SIGURD1A,0.9999933337101484,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,SIGURDG1,0.9997512885915069,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,STRONS3C,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,SPURNE3-,1.0001296698144637,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,SPURNE3A,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,METC1,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,FLOTTA1B,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,NWP3-,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,HAMMARS3A,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,SCORRA3C,1.003356533359408,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,NEWBIG3A,1.0044539476222885,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,NEWBIG1A,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,NEWBIG1B,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,NEWBIG1C,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,NEWBIG1D,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,BARNS3WA,0.9979688902517777,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,BARNS3WB,1.0,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,EDAY3C,1.0017496035632785,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,STHHOY3A,1.0093628903619416,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,STHHOY3B,1.0043841390720671,True
+B01_wave0MW_batt1x,Highest battery discharging,2019-01-02 10:00:00,NEWHOL3A,0.9990670652694887,True
