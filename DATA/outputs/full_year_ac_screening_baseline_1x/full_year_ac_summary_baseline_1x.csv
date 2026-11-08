@@ -1,0 +1,6 @@
+scenario_id,hours_total,hours_converged,pct_converged,hours_voltage_within_bounds,pct_voltage_within_bounds,v_min_observed,v_max_observed,hours_thermal_within_bounds,pct_thermal_within_bounds,n_thermal_exceedance_hours,max_line_loading_observed_pct,max_trafo_loading_observed_pct,hours_slack_within_tolerance,pct_slack_within_tolerance,target_trafo,target_trafo_exceedance_hours,target_trafo_exceedance_pct,target_trafo_max_loading_pct,runtime_seconds
+B01,8760,8760,100.0,8760,100.0,0.9758,1.0109,8204,93.653,556,76.18,116.95,3130,35.731,86129 - 86130,556,6.347,116.95,496.2
+B02,8760,8760,100.0,8760,100.0,0.9755,1.0109,8343,95.24,417,66.61,116.95,3644,41.598,86129 - 86130,417,4.76,116.95,556.4
+B03,8760,8760,100.0,8760,100.0,0.9756,1.0109,8369,95.537,391,68.26,116.95,3893,44.441,86129 - 86130,391,4.463,116.95,543.0
+B04,8760,8760,100.0,8760,100.0,0.9752,1.0109,8473,96.724,287,66.01,116.95,4379,49.989,86129 - 86130,287,3.276,116.95,435.2
+B05,8760,8760,100.0,8760,100.0,0.9741,1.0109,8559,97.705,201,61.79,116.95,3810,43.493,86129 - 86130,198,2.26,116.95,438.6

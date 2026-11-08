@@ -1,0 +1,29 @@
+category,detail,value
+RA ranking,threshold=0.10,Wind > Wave > Tidal
+RA ranking,threshold=0.20,Wind > Wave > Tidal
+RA ranking,threshold=0.30,Wind > Wave > Tidal
+RV ranking,threshold=0.10,Wind > Wave > Tidal
+RV values,threshold=0.10,"Wind=0.051826, Wave=0.048402, Tidal=0.038128"
+RV ranking,threshold=0.20,Wind > Wave > Tidal
+RV values,threshold=0.20,"Wind=0.101826, Wave=0.081735, Tidal=0.074429"
+RV ranking,threshold=0.30,Wind > Tidal > Wave
+RV values,threshold=0.30,"Wind=0.131849, Tidal=0.103082, Wave=0.097374"
+RP ranking,"threshold=0.10, window=1h",Wind > Wave > Tidal
+RP values,"threshold=0.10, window=1h","Wind=0.776142, Wave=0.771005, Tidal=0.703082"
+RP ranking,"threshold=0.10, window=3h",Wave > Wind > Tidal
+RP values,"threshold=0.10, window=3h","Wave=0.759534, Wind=0.734643, Tidal=0.381366"
+RP ranking,"threshold=0.10, window=6h",Wave > Wind > Tidal
+RP values,"threshold=0.10, window=6h","Wave=0.742776, Wind=0.679383, Tidal=0.002399"
+RP ranking,"threshold=0.20, window=1h",Wind > Wave > Tidal
+RP values,"threshold=0.20, window=1h","Wind=0.679338, Wave=0.630708, Tidal=0.583562"
+RP ranking,"threshold=0.20, window=3h",Wind > Wave > Tidal
+RP values,"threshold=0.20, window=3h","Wind=0.634277, Wave=0.615209, Tidal=0.275862"
+RP ranking,"threshold=0.20, window=6h",Wave > Wind > Tidal
+RP values,"threshold=0.20, window=6h","Wave=0.593832, Wind=0.575214, Tidal=0.000000"
+RP ranking,"threshold=0.30, window=1h",Wind > Wave > Tidal
+RP values,"threshold=0.30, window=1h","Wind=0.603539, Wave=0.532306, Tidal=0.492694"
+RP ranking,"threshold=0.30, window=3h",Wind > Wave > Tidal
+RP values,"threshold=0.30, window=3h","Wind=0.554921, Wave=0.513930, Tidal=0.204156"
+RP ranking,"threshold=0.30, window=6h",Wind > Wave > Tidal
+RP values,"threshold=0.30, window=6h","Wind=0.492404, Wave=0.488292, Tidal=0.000000"
+Highest annual Phi combination,-,Wind-Wave-Tidal (0.1634)

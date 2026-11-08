@@ -123,7 +123,7 @@ def add_loads_to_network(network, sim):
     # Load the data from the CSV file for load profiles
     file_path_load = os.path.join(sim.paths.inputs,"Load_Profile.csv")
     df = pd.read_csv(file_path_load)
-    df.DateTime = pd.to_datetime(df.DateTime)
+    df.DateTime = pd.to_datetime(df.DateTime, dayfirst=True)
 
     # Set the 'DateTime' column as the index
     df.set_index("DateTime", inplace=True)
@@ -264,6 +264,7 @@ def add_wind_turbines_to_network(network, sim, weather_state, storm_wind_speeds)
             # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             # NOTES TBC - KQ HELP NEEDED
             network.generators_t.p_max_pu[turbine_name] = wind_turbine_p_max_pu
+            network.generators_t.p_set[turbine_name] = wind_turbine_p_max_pu * max_power
             if "q_max" not in network.generators.columns:
                 network.generators["q_max"] = np.nan
             if "q_min" not in network.generators.columns:
@@ -320,6 +321,7 @@ def define_transformers(network, sim):
         os.path.join(sim.paths.inputs,"Transformer_types_definition.csv")
     )
     df = pd.read_csv(file_path)
+    df.columns = df.columns.str.replace('\r\n', '\n')
 
     # message_api('Define the transformer parameters based on your provided data')
     # Define the transformer parameters based on your provided data
@@ -442,95 +444,53 @@ def add_shunts_to_network(network, sim):
 def add_offshore_marine_to_network(network, sim):
     t0 = performance()
 
-    # vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  HARD-CODED CONTEXT (TBC)  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  ??YAML??
+    # vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  MODIFIED TIDAL SECTION  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  ??YAML??
     # Add constant tidal generators
-    EMEC_tidal_power = 4  # MW, replace with actual power value
-    EMEC_tidal_reactive_power = 1.31  # MVar PF = 0.95
+    # Load real tidal time series (Westray-South, Pennock et al.)
+    tidal_file = os.path.join(sim.paths.inputs, "tidal_orkney_2019.csv")
+    tidal_cf = pd.read_csv(tidal_file)
+    tidal_cf['time'] = pd.to_datetime(tidal_cf['time'])
+    tidal_cf.set_index('time', inplace=True)
+    tidal_cf = tidal_cf.loc[sim.params.start_date:sim.params.end_date]
+    tidal_p_max_pu = tidal_cf['power (pu)'].clip(0, 1)
 
-    EDAY_tidal_power = 7.6  # MW, replace with actual power value
-    EDAY_tidal_reactive_power = 2.50  # MVar PF = 0.95
+    # 7.2 MW — first two CfD projects (Orbital Marine Eday 1 + 2)
+    EDAY_tidal_power = sim.params.tidal_capacity # MW
 
-    if sim.params.legacy:
-        network.add(
-            "Generator",
-            name="EMEC Tidal Generator",
-            bus="NEWBIG1D",
-            p_nom=EMEC_tidal_power,
-            carrier="AC",
-            marginal_cost=30
-        )
-        network.add(
-            "Generator",
-            name="EDAY Tidal Generator",
-            bus="NEWBIG1A",
-            p_nom=EDAY_tidal_power,
-            carrier="AC",
-            marginal_cost=30
-        )
-    else:
-        network.add(
-            "Generator",
-            name="EMEC Tidal Generator",
-            bus="NEWBIG1D",
-            p_nom=EMEC_tidal_power,
-            p_set=pd.Series(
-                [EMEC_tidal_power] * len(network.snapshots), index=network.snapshots
-            ),
-            q_set=pd.Series(
-                [EMEC_tidal_reactive_power] * len(network.snapshots), index=network.snapshots
-            ),
-            carrier="AC",
-            marginal_cost=30
-        )
-
-        network.add(
-            "Generator",
-            name="EDAY Tidal Generator",
-            bus="NEWBIG1A",
-            p_nom=EDAY_tidal_power,
-            p_set=pd.Series(
-                [EDAY_tidal_power] * len(network.snapshots), index=network.snapshots
-            ),
-            q_set=pd.Series(
-                [EDAY_tidal_reactive_power] * len(network.snapshots), index=network.snapshots
-            ),
-            carrier="AC",
-            marginal_cost=30
-            
+    network.add(
+        "Generator",
+        name="EDAY Tidal Generator",
+        bus="NEWBIG1A",
+        p_nom=EDAY_tidal_power,
+        carrier="AC",
+        marginal_cost=30
     )
-    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  HARD-CODED CONTEXT (TBC)  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    network.generators_t.p_max_pu["EDAY Tidal Generator"] = tidal_p_max_pu
+    network.generators_t.p_set["EDAY Tidal Generator"] = tidal_p_max_pu * EDAY_tidal_power
 
-    # vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  HARD-CODED CONTEXT (TBC)  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    # Add constant wave generators
-    EMEC_wave_power = 7  # MW
-    EMEC_wave_reactive_power = 2.3  # MVar, PF = 0.95
-    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  HARD-CODED CONTEXT (TBC)  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  MODIFIED WAVE SECTION  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    # vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv  HARD-CODED CONTEXT (TBC)  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    if sim.params.legacy:
-        network.add(
-            "Generator",
-            name="Wave Generator",
-            bus="METC1",
-            p_nom=EMEC_wave_power,
-            carrier="AC",
-            marginal_cost=35
-        )
-    else:
-        network.add(
-            "Generator",
-            name="Wave Generator",
-            bus="METC1",
-            p_nom=EMEC_wave_power,
-            p_set=pd.Series(
-                [EMEC_wave_power] * len(network.snapshots), index=network.snapshots
-            ),
-            q_set=pd.Series(
-                [EMEC_wave_reactive_power] * len(network.snapshots), index=network.snapshots
-            ),
-            carrier="AC",
-            marginal_cost=35
+   # Add wave generator with real CorPower hourly time series
+    wave_file = os.path.join(sim.paths.inputs, "wave_orkney_2019.csv")
+    wave_cf = pd.read_csv(wave_file)
+    wave_cf['time'] = pd.to_datetime(wave_cf['time'])
+    wave_cf.set_index('time', inplace=True)
+    wave_cf = wave_cf.loc[sim.params.start_date:sim.params.end_date]
+    wave_p_max_pu = wave_cf['power (pu)'].clip(0, 1)
+
+    EMEC_wave_power = sim.params.wave_capacity  # MW, CorPower Phase 1 planned capacities
+
+    network.add(
+        "Generator",
+        name="Wave Generator",
+        bus="STROMN3A",
+        p_nom=EMEC_wave_power,
+        carrier="AC",
+        marginal_cost=35
     )
+    network.generators_t.p_max_pu["Wave Generator"] = wave_p_max_pu
+    network.generators_t.p_set["Wave Generator"] = wave_p_max_pu * EMEC_wave_power
+
     # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  HARD-CODED CONTEXT (TBC)  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     performance(t0)
@@ -538,15 +498,14 @@ def add_offshore_marine_to_network(network, sim):
 
 def add_control(network, sim):
     t0 = performance()
-    if sim.params.legacy:
-        network.generators.loc["Slack_generator", "control"] = "Slack"
-    else:
-        None
 
     network.buses["v_mag_pu_min"] = 0.90 
     network.buses["v_mag_pu_max"] = 1.10 
-    network.generators.control = "PV"
 
+    non_slack = network.generators.index != "Slack_generator"
+    network.generators.loc[non_slack, "control"] = "PV"
+    network.generators.loc["Slack_generator", "control"] = "Slack"
+    network.generators.loc["Slack_generator", "p_set"] = 0.0
 
     performance(t0)
 
